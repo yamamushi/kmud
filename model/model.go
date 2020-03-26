@@ -2,13 +2,13 @@ package model
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"sort"
 
-	db "github.com/Cristofori/kmud/database"
-	"github.com/Cristofori/kmud/events"
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	db "github.com/yamamushi/kmud/database"
+	"github.com/yamamushi/kmud/events"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -507,7 +507,7 @@ func MoveCharacter(character types.Character, direction types.Direction) error {
 
 	if newRoom == nil {
 		zone := GetZone(room.GetZoneId())
-		fmt.Printf("No room found at location %v %v, creating a new one (%s)\n", zone.GetName(), newLocation, character.GetName())
+		log.Println("No room found at location %v %v, creating a new one (%s)\n", zone.GetName(), newLocation, character.GetName())
 
 		var err error
 		newRoom, err = CreateRoom(GetZone(room.GetZoneId()), newLocation)

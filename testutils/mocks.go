@@ -1,7 +1,7 @@
 package testutils
 
 import (
-	"github.com/Cristofori/kmud/types"
+	"github.com/yamamushi/kmud/types"
 	"gopkg.in/mgo.v2/bson"
 )
 

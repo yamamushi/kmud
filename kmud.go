@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Cristofori/kmud/server"
+	"github.com/yamamushi/kmud/server"
 )
 
 func main() {

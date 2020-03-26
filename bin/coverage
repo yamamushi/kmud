@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"/..
 mkdir -p coverage/html
 
-PROJECT="github.com/Cristofori/kmud"
+PROJECT="github.com/yamamushi/kmud"
 HTML_INDEX="coverage/index.html"
 
 PACKAGES="

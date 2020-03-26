@@ -3,19 +3,20 @@ package server
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"runtime/debug"
 	"sort"
 	"strconv"
 	"time"
 
-	"github.com/Cristofori/kmud/database"
-	"github.com/Cristofori/kmud/engine"
-	"github.com/Cristofori/kmud/model"
-	"github.com/Cristofori/kmud/session"
-	"github.com/Cristofori/kmud/telnet"
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	"github.com/yamamushi/kmud/database"
+	"github.com/yamamushi/kmud/engine"
+	"github.com/yamamushi/kmud/model"
+	"github.com/yamamushi/kmud/session"
+	"github.com/yamamushi/kmud/telnet"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 	"gopkg.in/mgo.v2"
 )
 
@@ -339,7 +340,7 @@ func (self *connectionHandler) Handle() {
 				debug.PrintStack()
 			}
 
-			fmt.Printf("Lost connection to client (%v/%v): %v, %v\n",
+			log.Println("Lost connection to client (%v/%v): %v, %v\n",
 				username,
 				charname,
 				self.conn.RemoteAddr(),
@@ -365,7 +366,7 @@ func (self *connectionHandler) loggedIn() {
 		switch code {
 		case telnet.WS:
 			if len(data) != 4 {
-				fmt.Println("Malformed window size data:", data)
+				log.Println("Malformed window size data:", data)
 				return
 			}
 
@@ -392,12 +393,12 @@ func (self *connectionHandler) launchSession() {
 }
 
 func (self *Server) Start() {
-	fmt.Printf("Connecting to database... ")
+	log.Println("Connecting to database... ")
 	session, err := mgo.Dial("localhost")
 
 	utils.HandleError(err)
 
-	fmt.Println("done.")
+	log.Println("done.")
 
 	self.listener, err = net.Listen("tcp", ":8945")
 	utils.HandleError(err)
@@ -430,7 +431,7 @@ func (self *Server) Listen() {
 	for {
 		conn, err := self.listener.Accept()
 		utils.HandleError(err)
-		fmt.Println("Client connected:", conn.RemoteAddr())
+		log.Println("Client connected:", conn.RemoteAddr())
 		t := telnet.NewTelnet(conn)
 
 		wc := utils.NewWatchableReadWriter(t)

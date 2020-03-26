@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Cristofori/kmud/combat"
-	"github.com/Cristofori/kmud/engine"
-	"github.com/Cristofori/kmud/model"
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	"github.com/yamamushi/kmud/combat"
+	"github.com/yamamushi/kmud/engine"
+	"github.com/yamamushi/kmud/model"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 )
 
 type command struct {

@@ -3,9 +3,9 @@ package engine
 import (
 	"math"
 
-	"github.com/Cristofori/kmud/model"
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	"github.com/yamamushi/kmud/model"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 )
 
 func costEstimate(start, goal types.Room) int {
@@ -55,7 +55,7 @@ func FindPath(start, goal types.Room) []types.Room {
 	/*
 		t1 := time.Now()
 		defer func() {
-			fmt.Printf("Took %v to find a path from %v to %v in %s\n", time.Since(t1), start.GetLocation(), goal.GetLocation(), model.GetZone(start.GetZoneId()).GetName())
+			log.Println("Took %v to find a path from %v to %v in %s\n", time.Since(t1), start.GetLocation(), goal.GetLocation(), model.GetZone(start.GetZoneId()).GetName())
 		}()
 	*/
 

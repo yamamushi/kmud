@@ -4,3 +4,4 @@ kmud
 *.swo
 html
 coverage/
+.idea/

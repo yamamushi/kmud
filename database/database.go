@@ -2,13 +2,14 @@ package database
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/Cristofori/kmud/datastore"
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	"github.com/yamamushi/kmud/datastore"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -216,7 +217,7 @@ func commitObject(id types.Id) {
 	object.ReadUnlock()
 
 	if err != nil {
-		fmt.Println("Update failed", object.GetId())
+		log.Println("Update failed", object.GetId())
 	}
 
 	utils.HandleError(err)

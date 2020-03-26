@@ -3,8 +3,8 @@ package database
 import (
 	"sync"
 
-	"github.com/Cristofori/kmud/types"
-	"github.com/Cristofori/kmud/utils"
+	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 

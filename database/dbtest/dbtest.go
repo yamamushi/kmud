@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Cristofori/kmud/database"
-	"github.com/Cristofori/kmud/testutils"
-	"github.com/Cristofori/kmud/types"
+	"github.com/yamamushi/kmud/database"
+	"github.com/yamamushi/kmud/testutils"
+	"github.com/yamamushi/kmud/types"
 	"gopkg.in/mgo.v2/bson"
 )
 

@@ -1,7 +1,7 @@
 package telnet
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"strconv"
 	"time"
@@ -278,7 +278,7 @@ func (self *telnetProcessor) Read(p []byte) (int, error) {
 
 func (self *telnetProcessor) capture(b byte) {
 	if self.debug {
-		fmt.Println("Captured:", ByteToCodeString(b))
+		log.Println("Captured:", ByteToCodeString(b))
 	}
 
 	self.capturedBytes = append(self.capturedBytes, b)
@@ -298,7 +298,7 @@ func (self *telnetProcessor) resetSubDataField(code TelnetCode) {
 
 func (self *telnetProcessor) captureSubData(code TelnetCode, b byte) {
 	if self.debug {
-		fmt.Println("Captured subdata:", CodeToString(code), b)
+		log.Println("Captured subdata:", CodeToString(code), b)
 	}
 
 	if self.subdata == nil {

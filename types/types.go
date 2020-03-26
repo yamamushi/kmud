@@ -3,7 +3,7 @@ package types
 import (
 	"net"
 
-	"github.com/Cristofori/kmud/utils/naturalsort"
+	"github.com/yamamushi/kmud/utils/naturalsort"
 )
 
 type Id interface {

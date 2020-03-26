@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Cristofori/kmud/types"
+	"github.com/yamamushi/kmud/types"
 )
 
 const decorator = "-=-=-"
