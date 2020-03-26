@@ -22,15 +22,15 @@ func NewStore(name string, roomId types.Id) *Store {
 	return store
 }
 
-func (self *Store) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (s *Store) GetName() string {
+	s.ReadLock()
+	defer s.ReadUnlock()
 
-	return self.Name
+	return s.Name
 }
 
-func (self *Store) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (s *Store) SetName(name string) {
+	s.writeLock(func() {
+		s.Name = utils.FormatName(name)
 	})
 }

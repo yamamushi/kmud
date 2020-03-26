@@ -21,8 +21,8 @@ type command struct {
 	usage string
 }
 
-func (self *command) Usage(s *Session) {
-	s.WriteLine(fmt.Sprintf("Usage: %s", self.usage))
+func (c *command) Usage(s *Session) {
+	s.WriteLine(fmt.Sprintf("Usage: %s", c.usage))
 }
 
 var commands map[string]*command
@@ -35,7 +35,7 @@ func init() {
 	commands = map[string]*command{
 		"help": {
 			usage: "/help <command name>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
 					s.WriteLine("List of commands:")
 					var names []string
@@ -64,7 +64,7 @@ func init() {
 		},
 		"store": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Store", func(menu *utils.Menu) {
 					store := model.StoreIn(s.pc.GetRoomId())
 
@@ -92,13 +92,13 @@ func init() {
 		"loc": cAlias("location"),
 		"location": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.WriteLine("%v", s.GetRoom().GetLocation())
 			},
 		},
 		"room": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu(
 					"Room",
 					func(menu *utils.Menu) {
@@ -153,7 +153,7 @@ func init() {
 		},
 		"map": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				zoneRooms := model.GetRoomsInZone(s.currentZone().GetId())
 				roomsByLocation := map[types.Coordinate]types.Room{}
 
@@ -197,7 +197,7 @@ func init() {
 		"zone": {
 			admin: true,
 			usage: "/zone [list|rename <name>|new <name>|delete <name>]",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				subcommand, arg := utils.Argify(arg)
 				if subcommand == "" {
 					s.WriteLine("Current zone: " + types.Colorize(types.ColorBlue, s.currentZone().GetName()))
@@ -245,17 +245,17 @@ func init() {
 							s.printError("Zone not found")
 						}
 					} else {
-						self.Usage(s)
+						c.Usage(s)
 					}
 				} else {
-					self.Usage(s)
+					c.Usage(s)
 				}
 			},
 		},
 		"b": cAlias("broadcast"),
 		"broadcast": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
 					s.printError("Nothing to say")
 				} else {
@@ -266,7 +266,7 @@ func init() {
 		"s": cAlias("say"),
 		"say": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
 					s.printError("Nothing to say")
 				} else {
@@ -276,7 +276,7 @@ func init() {
 		},
 		"me": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				model.Emote(s.pc, arg)
 			},
 		},
@@ -291,7 +291,7 @@ func init() {
 		"teleport": {
 			admin: true,
 			usage: "/teleport [<zone>|<X> <Y> <Z>]",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				newZone := model.GetZoneByName(arg)
 				var newRoom types.Room
 
@@ -311,7 +311,7 @@ func init() {
 
 					if len(coords) != 3 || err != nil {
 						s.printError("Zone not found: %s", arg)
-						self.Usage(s)
+						c.Usage(s)
 					} else {
 						x, y, z = coords[0], coords[1], coords[2]
 					}
@@ -331,7 +331,7 @@ func init() {
 		},
 		"who": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				chars := model.GetOnlinePlayerCharacters()
 
 				s.WriteLine("")
@@ -346,7 +346,7 @@ func init() {
 		},
 		"colors": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.WriteLineColor(types.ColorNormal, "Normal")
 				s.WriteLineColor(types.ColorRed, "Red")
 				s.WriteLineColor(types.ColorDarkRed, "Dark Red")
@@ -368,7 +368,7 @@ func init() {
 		"cm": cAlias("colormode"),
 		"colormode": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
 					message := "Current color mode is: "
 					switch s.user.GetColorMode() {
@@ -401,9 +401,9 @@ func init() {
 		"destroyroom": {
 			admin: true,
 			usage: "/destroyroom <direction>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
-					self.Usage(s)
+					c.Usage(s)
 				} else {
 					direction := types.StringToDirection(arg)
 
@@ -424,7 +424,7 @@ func init() {
 		},
 		"npc": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("NPCs", func(menu *utils.Menu) {
 					var npcs types.NPCList
 					npcs = model.GetNpcs()
@@ -450,7 +450,7 @@ func init() {
 		"items": {
 			admin: true,
 			usage: "Usage: /items",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Items", func(menu *utils.Menu) {
 					menu.AddAction("n", "New", func() {
 						name := s.getRawUserInput("Item name: ")
@@ -472,9 +472,9 @@ func init() {
 		"destroyitem": {
 			admin: true,
 			usage: "/destroyitem <item name>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
-					self.Usage(s)
+					c.Usage(s)
 					return
 				} else {
 					itemsInRoom := model.ItemsIn(s.GetRoom().GetId())
@@ -494,14 +494,14 @@ func init() {
 		},
 		"roomid": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.WriteLine("Room ID: %v", s.GetRoom().GetId())
 			},
 		},
 		"cash": {
 			admin: true,
 			usage: "/cash give <amount>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				subcommand, arg := utils.Argify(arg)
 
 				if subcommand == "give" {
@@ -511,17 +511,17 @@ func init() {
 						s.WriteLine("Received: %v monies", amount)
 					} else {
 						s.printError(err.Error())
-						self.Usage(s)
+						c.Usage(s)
 					}
 				} else {
-					self.Usage(s)
+					c.Usage(s)
 				}
 			},
 		},
 		"ws": cAlias("windowsize"),
 		"windowsize": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				width, height := s.user.GetWindowSize()
 
 				header := fmt.Sprintf("Width: %v, Height: %v", width, height)
@@ -542,14 +542,14 @@ func init() {
 		"tt": cAlias("terminaltype"),
 		"terminaltype": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.WriteLine("Terminal type: %s", s.user.GetTerminalType())
 			},
 		},
 		"silent": {
 			admin: false,
 			usage: "/silent [on|off]",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
 					s.silentMode = !s.silentMode
 				} else if arg == "on" {
@@ -557,7 +557,7 @@ func init() {
 				} else if arg == "off" {
 					s.silentMode = false
 				} else {
-					self.Usage(s)
+					c.Usage(s)
 				}
 
 				if s.silentMode {
@@ -570,7 +570,7 @@ func init() {
 		"r": cAlias("reply"),
 		"reply": {
 			admin: false,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				targetChar := model.GetPlayerCharacter(s.replyId)
 
 				if targetChar == nil {
@@ -591,7 +591,7 @@ func init() {
 		},
 		"area": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Areas", func(menu *utils.Menu) {
 					menu.AddAction("n", "New", func() {
 						name := s.getName("Area name: ", types.AreaType)
@@ -612,7 +612,7 @@ func init() {
 		"link": {
 			admin: true,
 			usage: "Usage: /link <name> [single|double*] to start, /link to finish, /link remove <name> [single|double*], /link rename <old name> <new name>, /link cancel",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				args := strings.Split(arg, " ")
 				StateName := "Linking"
 
@@ -623,7 +623,7 @@ func init() {
 						linkData.source = nil
 						delete(s.states, StateName)
 					} else if len(args) != 0 {
-						self.Usage(s)
+						c.Usage(s)
 					} else {
 						sourceRoom := model.GetRoom(linkData.source)
 
@@ -639,7 +639,7 @@ func init() {
 					}
 				} else {
 					if len(args) == 0 {
-						self.Usage(s)
+						c.Usage(s)
 						return
 					}
 
@@ -649,13 +649,13 @@ func init() {
 							if args[2] == "single" || args[2] == "double" {
 								mode = args[2]
 							} else {
-								self.Usage(s)
+								c.Usage(s)
 								return
 							}
 						}
 
 						if len(args) != 2 {
-							self.Usage(s)
+							c.Usage(s)
 							return
 						}
 
@@ -685,7 +685,7 @@ func init() {
 							if args[1] == LinkSingle || args[1] == LinkDouble {
 								linkData.mode = args[1]
 							} else {
-								self.Usage(s)
+								c.Usage(s)
 								return
 							}
 						} else {
@@ -702,9 +702,9 @@ func init() {
 		"kill": {
 			admin: true,
 			usage: "/kill [npc name]",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
-					self.Usage(s)
+					c.Usage(s)
 				} else {
 					npcs := model.NpcsIn(s.pc.GetRoomId())
 					index := utils.BestMatch(arg, npcs.Characters().Names())
@@ -724,9 +724,9 @@ func init() {
 		"inspect": {
 			admin: true,
 			usage: "/inspect [name]",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				if arg == "" {
-					self.Usage(s)
+					c.Usage(s)
 				} else {
 					characters := model.CharactersIn(s.pc.GetRoomId())
 					index := utils.BestMatch(arg, characters.Names())
@@ -746,7 +746,7 @@ func init() {
 		},
 		"skills": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Skills", func(menu *utils.Menu) {
 					menu.AddAction("n", "New", func() {
 						name := s.getName("Skill name: ", types.SkillType)
@@ -766,7 +766,7 @@ func init() {
 		},
 		"effects": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Effects", func(menu *utils.Menu) {
 					menu.AddAction("n", "New", func() {
 						name := s.getName("Effect name: ", types.EffectType)
@@ -787,7 +787,7 @@ func init() {
 		},
 		"testmenu": {
 			admin: true,
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.execMenu("Menu Test", func(menu *utils.Menu) {
 					for i := 0; i < 500; i++ {
 						menu.AddActionI(i, fmt.Sprintf("Test Item %v", i), func() {
@@ -800,7 +800,7 @@ func init() {
 		"path": {
 			admin: true,
 			usage: "/path <coordinates>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				coords, err := utils.Atois(strings.Fields(arg))
 				if err == nil {
 					if len(coords) == 2 || len(coords) == 3 {
@@ -834,24 +834,24 @@ func init() {
 							s.printError("No room found at the given coordinates")
 						}
 					} else {
-						self.Usage(s)
+						c.Usage(s)
 					}
 				} else {
-					self.Usage(s)
+					c.Usage(s)
 				}
 			},
 		},
 		"time": {
 			admin: false,
 			usage: "/time",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				s.WriteLine("%v", model.GetWorld().GetTime())
 			},
 		},
 		"join": {
 			admin: true,
 			usage: "/join <player name>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				target := model.GetCharacterByName(arg)
 				if target == nil {
 					s.printError("Target not found")
@@ -864,7 +864,7 @@ func init() {
 		"bring": {
 			admin: true,
 			usage: "/bring <player name>",
-			exec: func(self *command, s *Session, arg string) {
+			exec: func(c *command, s *Session, arg string) {
 				// TODO - The target receives no indication that they've been moved
 				target := model.GetCharacterByName(arg)
 				if target == nil {
@@ -1147,10 +1147,10 @@ func quickRoom(s *Session, command string) {
 	s.GetRoom().SetExitEnabled(dir.Opposite(), true)
 }
 
-func whisper(self *command, s *Session, arg string) {
+func whisper(c *command, s *Session, arg string) {
 	name, message := utils.Argify(arg)
 	if message == "" {
-		self.Usage(s)
+		c.Usage(s)
 	} else {
 		targetChar := model.GetPlayerCharacterByName(name)
 

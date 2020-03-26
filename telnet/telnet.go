@@ -256,116 +256,116 @@ func newTelnetProcessor() *telnetProcessor {
 	return &tp
 }
 
-func (self *telnetProcessor) Read(p []byte) (int, error) {
+func (tp *telnetProcessor) Read(p []byte) (int, error) {
 	maxLen := len(p)
 
 	n := 0
 
-	if maxLen >= len(self.cleanData) {
-		n = len(self.cleanData)
+	if maxLen >= len(tp.cleanData) {
+		n = len(tp.cleanData)
 	} else {
 		n = maxLen
 	}
 
 	for i := 0; i < n; i++ {
-		p[i] = self.cleanData[i]
+		p[i] = tp.cleanData[i]
 	}
 
-	self.cleanData = self.cleanData[n:] // TODO: Memory leak?
+	tp.cleanData = tp.cleanData[n:] // TODO: Memory leak?
 
 	return n, nil
 }
 
-func (self *telnetProcessor) capture(b byte) {
-	if self.debug {
+func (tp *telnetProcessor) capture(b byte) {
+	if tp.debug {
 		log.Println("Captured:", ByteToCodeString(b))
 	}
 
-	self.capturedBytes = append(self.capturedBytes, b)
+	tp.capturedBytes = append(tp.capturedBytes, b)
 }
 
-func (self *telnetProcessor) dontCapture(b byte) {
-	self.cleanData = self.cleanData + string(b)
+func (tp *telnetProcessor) dontCapture(b byte) {
+	tp.cleanData = tp.cleanData + string(b)
 }
 
-func (self *telnetProcessor) resetSubDataField(code TelnetCode) {
-	if self.subdata == nil {
-		self.subdata = map[TelnetCode][]byte{}
+func (tp *telnetProcessor) resetSubDataField(code TelnetCode) {
+	if tp.subdata == nil {
+		tp.subdata = map[TelnetCode][]byte{}
 	}
 
-	self.subdata[code] = []byte{}
+	tp.subdata[code] = []byte{}
 }
 
-func (self *telnetProcessor) captureSubData(code TelnetCode, b byte) {
-	if self.debug {
+func (tp *telnetProcessor) captureSubData(code TelnetCode, b byte) {
+	if tp.debug {
 		log.Println("Captured subdata:", CodeToString(code), b)
 	}
 
-	if self.subdata == nil {
-		self.subdata = map[TelnetCode][]byte{}
+	if tp.subdata == nil {
+		tp.subdata = map[TelnetCode][]byte{}
 	}
 
-	self.subdata[code] = append(self.subdata[code], b)
+	tp.subdata[code] = append(tp.subdata[code], b)
 }
 
-func (self *telnetProcessor) addBytes(bytes []byte) {
+func (tp *telnetProcessor) addBytes(bytes []byte) {
 	for _, b := range bytes {
-		self.addByte(b)
+		tp.addByte(b)
 	}
 }
 
-func (self *telnetProcessor) addByte(b byte) {
+func (tp *telnetProcessor) addByte(b byte) {
 	code := byteToCode[b]
 
-	switch self.state {
+	switch tp.state {
 	case stateBase:
 		if code == IAC {
-			self.state = stateInIAC
-			self.capture(b)
+			tp.state = stateInIAC
+			tp.capture(b)
 		} else {
-			self.dontCapture(b)
+			tp.dontCapture(b)
 		}
 
 	case stateInIAC:
 		if code == WILL || code == WONT || code == DO || code == DONT {
 			// Stay in this state
 		} else if code == SB {
-			self.state = stateInSB
+			tp.state = stateInSB
 		} else {
-			self.state = stateBase
+			tp.state = stateBase
 		}
-		self.capture(b)
+		tp.capture(b)
 
 	case stateInSB:
-		self.capture(b)
-		self.currentSB = code
-		self.state = stateCapSB
-		self.resetSubDataField(code)
+		tp.capture(b)
+		tp.currentSB = code
+		tp.state = stateCapSB
+		tp.resetSubDataField(code)
 
 	case stateCapSB:
 		if code == IAC {
-			self.state = stateEscIAC
+			tp.state = stateEscIAC
 		} else {
-			self.captureSubData(self.currentSB, b)
+			tp.captureSubData(tp.currentSB, b)
 		}
 
 	case stateEscIAC:
 		if code == IAC {
-			self.state = stateCapSB
-			self.captureSubData(self.currentSB, b)
+			tp.state = stateCapSB
+			tp.captureSubData(tp.currentSB, b)
 		} else {
-			self.subDataFinished(self.currentSB)
-			self.currentSB = NUL
-			self.state = stateBase
-			self.addByte(codeToByte[IAC])
-			self.addByte(b)
+			tp.subDataFinished(tp.currentSB)
+			tp.currentSB = NUL
+			tp.state = stateBase
+			tp.addByte(codeToByte[IAC])
+			tp.addByte(b)
 		}
 	}
 }
 
-func (self *telnetProcessor) subDataFinished(code TelnetCode) {
-	if self.listenFunc != nil {
-		self.listenFunc(code, self.subdata[code])
+func (tp *telnetProcessor) subDataFinished(code TelnetCode) {
+	if tp.listenFunc != nil {
+		tp.listenFunc(code, tp.subdata[code])
 	}
 }
 

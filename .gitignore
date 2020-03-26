@@ -5,3 +5,4 @@ kmud
 html
 coverage/
 .idea/
+*.conf

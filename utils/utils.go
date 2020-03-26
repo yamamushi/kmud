@@ -301,12 +301,12 @@ func NewThrottler(interval time.Duration) *Throttler {
 	return &throttler
 }
 
-func (self *Throttler) Sync() {
-	diff := time.Since(self.lastTime)
-	if diff < self.interval {
-		time.Sleep(self.interval - diff)
+func (t *Throttler) Sync() {
+	diff := time.Since(t.lastTime)
+	if diff < t.interval {
+		time.Sleep(t.interval - diff)
 	}
-	self.lastTime = time.Now()
+	t.lastTime = time.Now()
 }
 
 // Random returns a random integer between low and high, inclusive

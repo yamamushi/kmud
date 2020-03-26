@@ -7,35 +7,35 @@ import (
 
 type MockId string
 
-func (self MockId) String() string {
-	return string(self)
+func (m MockId) String() string {
+	return string(m)
 }
 
-func (self MockId) Hex() string {
-	return string(self)
+func (m MockId) Hex() string {
+	return string(m)
 }
 
 type MockIdentifiable struct {
 	Id types.Id
 }
 
-func (self MockIdentifiable) GetId() types.Id {
-	return self.Id
+func (m MockIdentifiable) GetId() types.Id {
+	return m.Id
 }
 
-func (self MockObject) SetId(types.Id) {
+func (m MockObject) SetId(types.Id) {
 }
 
 type MockNameable struct {
 	Name string
 }
 
-func (self MockNameable) GetName() string {
-	return self.Name
+func (n MockNameable) GetName() string {
+	return n.Name
 }
 
-func (self *MockNameable) SetName(name string) {
-	self.Name = name
+func (s *MockNameable) SetName(name string) {
+	s.Name = name
 }
 
 type MockDestroyable struct {
@@ -44,7 +44,7 @@ type MockDestroyable struct {
 func (MockDestroyable) Destroy() {
 }
 
-func (self MockDestroyable) IsDestroyed() bool {
+func (d MockDestroyable) IsDestroyed() bool {
 	return false
 }
 
@@ -171,20 +171,20 @@ func NewMockPC() *MockPC {
 	}
 }
 
-func (self MockPC) GetRoomId() types.Id {
-	return self.RoomId
+func (p MockPC) GetRoomId() types.Id {
+	return p.RoomId
 }
 
-func (self MockPC) IsOnline() bool {
+func (p MockPC) IsOnline() bool {
 	return true
 }
 
-func (self MockPC) SetRoomId(types.Id) {
+func (p MockPC) SetRoomId(types.Id) {
 }
 
-func (self MockPC) GetSkills() []types.Id {
+func (p MockPC) GetSkills() []types.Id {
 	return []types.Id{}
 }
 
-func (self MockPC) AddSkill(types.Id) {
+func (p MockPC) AddSkill(types.Id) {
 }

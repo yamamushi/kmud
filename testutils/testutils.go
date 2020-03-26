@@ -12,8 +12,8 @@ type TestWriter struct {
 	Wrote string
 }
 
-func (self *TestWriter) Write(p []byte) (n int, err error) {
-	self.Wrote += string(p)
+func (s *TestWriter) Write(p []byte) (n int, err error) {
+	s.Wrote += string(p)
 	return len(p), nil
 }
 
@@ -22,22 +22,22 @@ type TestReader struct {
 	err    error
 }
 
-func (self *TestReader) Read(p []byte) (n int, err error) {
-	if self.err != nil {
-		return 0, self.err
+func (s *TestReader) Read(p []byte) (n int, err error) {
+	if s.err != nil {
+		return 0, s.err
 	}
 
-	for i := 0; i < len(self.ToRead); i++ {
-		p[i] = self.ToRead[i]
+	for i := 0; i < len(s.ToRead); i++ {
+		p[i] = s.ToRead[i]
 	}
 
-	p[len(self.ToRead)] = '\n'
+	p[len(s.ToRead)] = '\n'
 
-	return len(self.ToRead) + 1, nil
+	return len(s.ToRead) + 1, nil
 }
 
-func (self *TestReader) SetError(err error) {
-	self.err = err
+func (s *TestReader) SetError(err error) {
+	s.err = err
 }
 
 type TestReadWriter struct {
@@ -49,22 +49,22 @@ type TestCommunicable struct {
 	TestReadWriter
 }
 
-func (self *TestCommunicable) Write(text string) {
-	self.TestReadWriter.Write([]byte(text))
+func (s *TestCommunicable) Write(text string) {
+	s.TestReadWriter.Write([]byte(text))
 }
 
-func (self *TestCommunicable) WriteLine(line string, a ...interface{}) {
-	self.Write(fmt.Sprintf(line, a...) + "\n")
+func (s *TestCommunicable) WriteLine(line string, a ...interface{}) {
+	s.Write(fmt.Sprintf(line, a...) + "\n")
 }
 
-func (self *TestCommunicable) GetInput(prompt string) string {
-	self.Write(prompt)
+func (s *TestCommunicable) GetInput(prompt string) string {
+	s.Write(prompt)
 	buf := make([]byte, 1024)
-	n, _ := self.Read(buf)
+	n, _ := s.Read(buf)
 	return strings.ToLower(strings.TrimSpace(string(buf[:n])))
 }
 
-func (self *TestCommunicable) GetWindowSize() (int, int) {
+func (s *TestCommunicable) GetWindowSize() (int, int) {
 	return 80, 40
 }
 

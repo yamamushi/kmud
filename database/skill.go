@@ -21,41 +21,41 @@ func NewSkill(name string) *Skill {
 	return skill
 }
 
-func (self *Skill) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Name
+func (s *Skill) GetName() string {
+	s.ReadLock()
+	defer s.ReadUnlock()
+	return s.Name
 }
 
-func (self *Skill) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (s *Skill) SetName(name string) {
+	s.writeLock(func() {
+		s.Name = utils.FormatName(name)
 	})
 }
 
-func (self *Skill) AddEffect(id types.Id) {
-	self.writeLock(func() {
-		if self.Effects == nil {
-			self.Effects = utils.Set{}
+func (s *Skill) AddEffect(id types.Id) {
+	s.writeLock(func() {
+		if s.Effects == nil {
+			s.Effects = utils.Set{}
 		}
-		self.Effects.Insert(id.Hex())
+		s.Effects.Insert(id.Hex())
 	})
 }
 
-func (self *Skill) RemoveEffect(id types.Id) {
-	self.writeLock(func() {
-		self.Effects.Remove(id.Hex())
+func (s *Skill) RemoveEffect(id types.Id) {
+	s.writeLock(func() {
+		s.Effects.Remove(id.Hex())
 	})
 }
 
-func (self *Skill) GetEffects() []types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return idSetToList(self.Effects)
+func (s *Skill) GetEffects() []types.Id {
+	s.ReadLock()
+	defer s.ReadUnlock()
+	return idSetToList(s.Effects)
 }
 
-func (self *Skill) HasEffect(id types.Id) bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Effects.Contains(id.Hex())
+func (s *Skill) HasEffect(id types.Id) bool {
+	s.ReadLock()
+	defer s.ReadUnlock()
+	return s.Effects.Contains(id.Hex())
 }

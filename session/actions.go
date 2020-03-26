@@ -87,7 +87,7 @@ var actions = map[string]action{
 			} else {
 				defender := charList[index]
 				if defender.GetId() == s.pc.GetId() {
-					s.printError("You can't attack yourself")
+					s.printError("You can't attack yours")
 				} else {
 					combat.StartFight(s.pc, nil, defender)
 				}

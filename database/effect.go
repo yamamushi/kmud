@@ -30,86 +30,86 @@ func NewEffect(name string) types.Effect {
 	return effect
 }
 
-func (self *Effect) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Name
+func (e *Effect) GetName() string {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Name
 }
 
-func (self *Effect) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (e *Effect) SetName(name string) {
+	e.writeLock(func() {
+		e.Name = utils.FormatName(name)
 	})
 }
 
-func (self *Effect) GetType() types.EffectKind {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Type
+func (e *Effect) GetType() types.EffectKind {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Type
 }
 
-func (self *Effect) SetType(effectKind types.EffectKind) {
-	self.writeLock(func() {
-		self.Type = effectKind
+func (e *Effect) SetType(effectKind types.EffectKind) {
+	e.writeLock(func() {
+		e.Type = effectKind
 	})
 }
 
-func (self *Effect) GetPower() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Power
+func (e *Effect) GetPower() int {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Power
 }
 
-func (self *Effect) SetPower(power int) {
-	self.writeLock(func() {
-		self.Power = power
+func (e *Effect) SetPower(power int) {
+	e.writeLock(func() {
+		e.Power = power
 	})
 }
 
-func (self *Effect) GetCost() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Cost
+func (e *Effect) GetCost() int {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Cost
 }
 
-func (self *Effect) SetCost(cost int) {
-	self.writeLock(func() {
-		self.Cost = cost
+func (e *Effect) SetCost(cost int) {
+	e.writeLock(func() {
+		e.Cost = cost
 	})
 }
 
-func (self *Effect) GetVariance() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Variance
+func (e *Effect) GetVariance() int {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Variance
 }
 
-func (self *Effect) SetVariance(variance int) {
-	self.writeLock(func() {
-		self.Variance = variance
+func (e *Effect) SetVariance(variance int) {
+	e.writeLock(func() {
+		e.Variance = variance
 	})
 }
 
-func (self *Effect) GetSpeed() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Speed
+func (e *Effect) GetSpeed() int {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Speed
 }
 
-func (self *Effect) SetSpeed(speed int) {
-	self.writeLock(func() {
-		self.Speed = speed
+func (e *Effect) SetSpeed(speed int) {
+	e.writeLock(func() {
+		e.Speed = speed
 	})
 }
 
-func (self *Effect) GetTime() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Time
+func (e *Effect) GetTime() int {
+	e.ReadLock()
+	defer e.ReadUnlock()
+	return e.Time
 }
 
-func (self *Effect) SetTime(speed int) {
-	self.writeLock(func() {
-		self.Time = speed
+func (e *Effect) SetTime(speed int) {
+	e.writeLock(func() {
+		e.Time = speed
 	})
 }

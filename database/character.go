@@ -74,190 +74,190 @@ func NewSpawner(name string, areaId types.Id) *Spawner {
 	return spawner
 }
 
-func (self *Character) initCharacter(name string, objType types.ObjectType, roomId types.Id) {
-	self.RoomId = roomId
-	self.Cash = 0
-	self.HitPoints = 100
-	self.Name = utils.FormatName(name)
+func (c *Character) initCharacter(name string, objType types.ObjectType, roomId types.Id) {
+	c.RoomId = roomId
+	c.Cash = 0
+	c.HitPoints = 100
+	c.Name = utils.FormatName(name)
 
-	self.Strength = 10
-	self.Vitality = 100
+	c.Strength = 10
+	c.Vitality = 100
 }
 
-func (self *Character) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (c *Character) GetName() string {
+	c.ReadLock()
+	defer c.ReadUnlock()
 
-	return self.Name
+	return c.Name
 }
 
-func (self *Character) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (c *Character) SetName(name string) {
+	c.writeLock(func() {
+		c.Name = utils.FormatName(name)
 	})
 }
 
-func (self *Character) GetCapacity() int {
-	return self.GetStrength() * 10
+func (c *Character) GetCapacity() int {
+	return c.GetStrength() * 10
 }
 
-func (self *Character) GetStrength() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Strength
+func (c *Character) GetStrength() int {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.Strength
 }
 
-func (self *Pc) SetOnline(online bool) {
-	self.WriteLock()
-	defer self.WriteUnlock()
-	self.online = online
+func (pc *Pc) SetOnline(online bool) {
+	pc.WriteLock()
+	defer pc.WriteUnlock()
+	pc.online = online
 }
 
-func (self *Pc) IsOnline() bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.online
+func (pc *Pc) IsOnline() bool {
+	pc.ReadLock()
+	defer pc.ReadUnlock()
+	return pc.online
 }
 
-func (self *Character) SetRoomId(id types.Id) {
-	self.writeLock(func() {
-		self.RoomId = id
+func (c *Character) SetRoomId(id types.Id) {
+	c.writeLock(func() {
+		c.RoomId = id
 	})
 }
 
-func (self *Character) GetRoomId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.RoomId
+func (c *Character) GetRoomId() types.Id {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.RoomId
 }
 
-func (self *Pc) SetUserId(id types.Id) {
-	self.writeLock(func() {
-		self.UserId = id
+func (pc *Pc) SetUserId(id types.Id) {
+	pc.writeLock(func() {
+		pc.UserId = id
 	})
 }
 
-func (self *Pc) GetUserId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.UserId
+func (pc *Pc) GetUserId() types.Id {
+	pc.ReadLock()
+	defer pc.ReadUnlock()
+	return pc.UserId
 }
 
-func (self *Character) AddSkill(id types.Id) {
-	self.writeLock(func() {
-		if self.Skills == nil {
-			self.Skills = utils.Set{}
+func (c *Character) AddSkill(id types.Id) {
+	c.writeLock(func() {
+		if c.Skills == nil {
+			c.Skills = utils.Set{}
 		}
-		self.Skills.Insert(id.Hex())
+		c.Skills.Insert(id.Hex())
 	})
 }
 
-func (self *Character) RemoveSkill(id types.Id) {
-	self.writeLock(func() {
-		self.Skills.Remove(id.Hex())
+func (c *Character) RemoveSkill(id types.Id) {
+	c.writeLock(func() {
+		c.Skills.Remove(id.Hex())
 	})
 }
 
-func (self *Character) HasSkill(id types.Id) bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Skills.Contains(id.Hex())
+func (c *Character) HasSkill(id types.Id) bool {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.Skills.Contains(id.Hex())
 }
 
-func (self *Character) GetSkills() []types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return idSetToList(self.Skills)
+func (c *Character) GetSkills() []types.Id {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return idSetToList(c.Skills)
 }
 
-func (self *Npc) SetConversation(conversation string) {
-	self.writeLock(func() {
-		self.Conversation = conversation
+func (n *Npc) SetConversation(conversation string) {
+	n.writeLock(func() {
+		n.Conversation = conversation
 	})
 }
 
-func (self *Npc) GetConversation() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Conversation
+func (n *Npc) GetConversation() string {
+	n.ReadLock()
+	defer n.ReadUnlock()
+	return n.Conversation
 }
 
-func (self *Npc) PrettyConversation() string {
-	conv := self.GetConversation()
+func (n *Npc) PrettyConversation() string {
+	conv := n.GetConversation()
 
 	if conv == "" {
-		return fmt.Sprintf("%s has nothing to say", self.GetName())
+		return fmt.Sprintf("%n has nothing to say", n.GetName())
 	}
 
-	return fmt.Sprintf("%s%s",
-		types.Colorize(types.ColorBlue, self.GetName()),
+	return fmt.Sprintf("%n%n",
+		types.Colorize(types.ColorBlue, n.GetName()),
 		types.Colorize(types.ColorWhite, ": "+conv))
 }
 
-func (self *Character) SetHealth(health int) {
-	self.writeLock(func() {
-		self.Vitality = health
-		if self.HitPoints > self.Vitality {
-			self.HitPoints = self.Vitality
+func (c *Character) SetHealth(health int) {
+	c.writeLock(func() {
+		c.Vitality = health
+		if c.HitPoints > c.Vitality {
+			c.HitPoints = c.Vitality
 		}
 	})
 }
 
-func (self *Character) GetHealth() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Vitality
+func (c *Character) GetHealth() int {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.Vitality
 }
 
-func (self *Character) SetHitPoints(hitpoints int) {
-	self.writeLock(func() {
-		if hitpoints > self.Vitality {
-			hitpoints = self.Vitality
+func (c *Character) SetHitPoints(hitpoints int) {
+	c.writeLock(func() {
+		if hitpoints > c.Vitality {
+			hitpoints = c.Vitality
 		}
-		self.HitPoints = hitpoints
+		c.HitPoints = hitpoints
 	})
 }
 
-func (self *Character) GetHitPoints() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.HitPoints
+func (c *Character) GetHitPoints() int {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.HitPoints
 }
 
-func (self *Character) Hit(hitpoints int) {
-	self.SetHitPoints(self.GetHitPoints() - hitpoints)
+func (c *Character) Hit(hitpoints int) {
+	c.SetHitPoints(c.GetHitPoints() - hitpoints)
 }
 
-func (self *Character) Heal(hitpoints int) {
-	self.SetHitPoints(self.GetHitPoints() + hitpoints)
+func (c *Character) Heal(hitpoints int) {
+	c.SetHitPoints(c.GetHitPoints() + hitpoints)
 }
 
-func (self *Npc) GetRoaming() bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Roaming
+func (n *Npc) GetRoaming() bool {
+	n.ReadLock()
+	defer n.ReadUnlock()
+	return n.Roaming
 }
 
-func (self *Npc) SetRoaming(roaming bool) {
-	self.writeLock(func() {
-		self.Roaming = roaming
+func (n *Npc) SetRoaming(roaming bool) {
+	n.writeLock(func() {
+		n.Roaming = roaming
 	})
 }
 
-func (self *Spawner) SetCount(count int) {
-	self.writeLock(func() {
-		self.Count = count
+func (s *Spawner) SetCount(count int) {
+	s.writeLock(func() {
+		s.Count = count
 	})
 }
 
-func (self *Spawner) GetCount() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Count
+func (s *Spawner) GetCount() int {
+	s.ReadLock()
+	defer s.ReadUnlock()
+	return s.Count
 }
 
-func (self *Spawner) GetAreaId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.AreaId
+func (s *Spawner) GetAreaId() types.Id {
+	s.ReadLock()
+	defer s.ReadUnlock()
+	return s.AreaId
 }

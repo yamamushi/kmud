@@ -15,57 +15,57 @@ type DbObject struct {
 	destroyed bool
 }
 
-func (self *DbObject) SetId(id types.Id) {
-	self.Id = id
+func (d *DbObject) SetId(id types.Id) {
+	d.Id = id
 }
 
-func (self *DbObject) GetId() types.Id {
-	return self.Id
+func (d *DbObject) GetId() types.Id {
+	return d.Id
 }
 
-func (self *DbObject) ReadLock() {
-	self.mutex.RLock()
+func (d *DbObject) ReadLock() {
+	d.mutex.RLock()
 }
 
-func (self *DbObject) ReadUnlock() {
-	self.mutex.RUnlock()
+func (d *DbObject) ReadUnlock() {
+	d.mutex.RUnlock()
 }
 
-func (self *DbObject) WriteLock() {
-	self.mutex.Lock()
+func (d *DbObject) WriteLock() {
+	d.mutex.Lock()
 }
 
-func (self *DbObject) writeLock(worker func()) {
-	self.WriteLock()
-	defer self.WriteUnlock()
-	defer self.modified()
+func (d *DbObject) writeLock(worker func()) {
+	d.WriteLock()
+	defer d.WriteUnlock()
+	defer d.modified()
 	worker()
 }
 
-func (self *DbObject) WriteUnlock() {
-	self.mutex.Unlock()
+func (d *DbObject) WriteUnlock() {
+	d.mutex.Unlock()
 }
 
-func (self *DbObject) Destroy() {
-	self.WriteLock()
-	defer self.WriteUnlock()
+func (d *DbObject) Destroy() {
+	d.WriteLock()
+	defer d.WriteUnlock()
 
-	self.destroyed = true
+	d.destroyed = true
 }
 
-func (self *DbObject) IsDestroyed() bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (d *DbObject) IsDestroyed() bool {
+	d.ReadLock()
+	defer d.ReadUnlock()
 
-	return self.destroyed
+	return d.destroyed
 }
 
-func (self *DbObject) modified() {
-	modifiedObjectChannel <- self.Id
+func (d *DbObject) modified() {
+	modifiedObjectChannel <- d.Id
 }
 
-func (self *DbObject) syncModified() {
-	commitObject(self.Id)
+func (d *DbObject) syncModified() {
+	commitObject(d.Id)
 }
 
 func idSetToList(set utils.Set) []types.Id {

@@ -90,9 +90,9 @@ type Character interface {
 
 type CharacterList []Character
 
-func (self CharacterList) Names() []string {
-	names := make([]string, len(self))
-	for i, char := range self {
+func (l CharacterList) Names() []string {
+	names := make([]string, len(l))
+	for i, char := range l {
 		names[i] = char.GetName()
 	}
 	return names
@@ -105,9 +105,9 @@ type PC interface {
 
 type PCList []PC
 
-func (self PCList) Characters() CharacterList {
-	chars := make(CharacterList, len(self))
-	for i, pc := range self {
+func (l PCList) Characters() CharacterList {
+	chars := make(CharacterList, len(l))
+	for i, pc := range l {
 		chars[i] = pc
 	}
 	return chars
@@ -133,9 +133,9 @@ type Spawner interface {
 
 type SpawnerList []Spawner
 
-func (self NPCList) Characters() CharacterList {
-	chars := make(CharacterList, len(self))
-	for i, npc := range self {
+func (l NPCList) Characters() CharacterList {
+	chars := make(CharacterList, len(l))
+	for i, npc := range l {
 		chars[i] = npc
 	}
 	return chars
@@ -215,16 +215,16 @@ type User interface {
 
 type UserList []User
 
-func (self UserList) Len() int {
-	return len(self)
+func (l UserList) Len() int {
+	return len(l)
 }
 
-func (self UserList) Less(i, j int) bool {
-	return naturalsort.NaturalLessThan(self[i].GetName(), self[j].GetName())
+func (l UserList) Less(i, j int) bool {
+	return naturalsort.NaturalLessThan(l[i].GetName(), l[j].GetName())
 }
 
-func (self UserList) Swap(i, j int) {
-	self[i], self[j] = self[j], self[i]
+func (l UserList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
 }
 
 type Template interface {
@@ -240,24 +240,24 @@ type Template interface {
 
 type TemplateList []Template
 
-func (self TemplateList) Names() []string {
-	names := make([]string, len(self))
-	for i, item := range self {
+func (l TemplateList) Names() []string {
+	names := make([]string, len(l))
+	for i, item := range l {
 		names[i] = item.GetName()
 	}
 	return names
 }
 
-func (self TemplateList) Len() int {
-	return len(self)
+func (l TemplateList) Len() int {
+	return len(l)
 }
 
-func (self TemplateList) Less(i, j int) bool {
-	return naturalsort.NaturalLessThan(self[i].GetName(), self[j].GetName())
+func (l TemplateList) Less(i, j int) bool {
+	return naturalsort.NaturalLessThan(l[i].GetName(), l[j].GetName())
 }
 
-func (self TemplateList) Swap(i, j int) {
-	self[i], self[j] = self[j], self[i]
+func (l TemplateList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
 }
 
 type Item interface {
@@ -274,24 +274,24 @@ type Item interface {
 
 type ItemList []Item
 
-func (self ItemList) Names() []string {
-	names := make([]string, len(self))
-	for i, item := range self {
+func (l ItemList) Names() []string {
+	names := make([]string, len(l))
+	for i, item := range l {
 		names[i] = item.GetName()
 	}
 	return names
 }
 
-func (self ItemList) Len() int {
-	return len(self)
+func (l ItemList) Len() int {
+	return len(l)
 }
 
-func (self ItemList) Less(i, j int) bool {
-	return naturalsort.NaturalLessThan(self[i].GetName(), self[j].GetName())
+func (l ItemList) Less(i, j int) bool {
+	return naturalsort.NaturalLessThan(l[i].GetName(), l[j].GetName())
 }
 
-func (self ItemList) Swap(i, j int) {
-	self[i], self[j] = self[j], self[i]
+func (l ItemList) Swap(i, j int) {
+	l[i], l[j] = l[j], l[i]
 }
 
 type Skill interface {
@@ -313,9 +313,9 @@ const (
 	StunEffect     EffectKind = "stun"
 )
 
-func (self SkillList) Names() []string {
-	names := make([]string, len(self))
-	for i, skill := range self {
+func (l SkillList) Names() []string {
+	names := make([]string, len(l))
+	for i, skill := range l {
 		names[i] = skill.GetName()
 	}
 	return names
@@ -340,9 +340,9 @@ type Effect interface {
 
 type EffectList []Effect
 
-func (self EffectList) Names() []string {
-	names := make([]string, len(self))
-	for i, skill := range self {
+func (l EffectList) Names() []string {
+	names := make([]string, len(l))
+	for i, skill := range l {
 		names[i] = skill.GetName()
 	}
 	return names

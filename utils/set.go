@@ -2,19 +2,19 @@ package utils
 
 type Set map[string]bool
 
-func (self Set) Contains(key string) bool {
-	_, found := self[key]
+func (s Set) Contains(key string) bool {
+	_, found := s[key]
 	return found
 }
 
-func (self Set) Insert(key string) {
-	self[key] = true
+func (s Set) Insert(key string) {
+	s[key] = true
 }
 
-func (self Set) Remove(key string) {
-	delete(self, key)
+func (s Set) Remove(key string) {
+	delete(s, key)
 }
 
-func (self Set) Size() int {
-	return len(self)
+func (s Set) Size() int {
+	return len(s)
 }

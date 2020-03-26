@@ -39,108 +39,108 @@ func NewItem(templateId types.Id) *Item {
 
 // Template
 
-func (self *Template) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (t *Template) GetName() string {
+	t.ReadLock()
+	defer t.ReadUnlock()
 
-	return self.Name
+	return t.Name
 }
 
-func (self *Template) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (t *Template) SetName(name string) {
+	t.writeLock(func() {
+		t.Name = utils.FormatName(name)
 	})
 }
 
-func (self *Template) SetValue(value int) {
-	self.writeLock(func() {
-		self.Value = value
+func (t *Template) SetValue(value int) {
+	t.writeLock(func() {
+		t.Value = value
 	})
 }
 
-func (self *Template) GetValue() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Value
+func (t *Template) GetValue() int {
+	t.ReadLock()
+	defer t.ReadUnlock()
+	return t.Value
 }
 
-func (self *Template) GetWeight() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Weight
+func (t *Template) GetWeight() int {
+	t.ReadLock()
+	defer t.ReadUnlock()
+	return t.Weight
 }
 
-func (self *Template) SetWeight(weight int) {
-	self.writeLock(func() {
-		self.Weight = weight
+func (t *Template) SetWeight(weight int) {
+	t.writeLock(func() {
+		t.Weight = weight
 	})
 }
 
-func (self *Template) GetCapacity() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Capacity
+func (t *Template) GetCapacity() int {
+	t.ReadLock()
+	defer t.ReadUnlock()
+	return t.Capacity
 }
 
-func (self *Template) SetCapacity(capacity int) {
-	self.writeLock(func() {
-		self.Capacity = capacity
+func (t *Template) SetCapacity(capacity int) {
+	t.writeLock(func() {
+		t.Capacity = capacity
 	})
 }
 
 // Item
 
-func (self *Item) GetTemplateId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.TemplateId
+func (i *Item) GetTemplateId() types.Id {
+	i.ReadLock()
+	defer i.ReadUnlock()
+	return i.TemplateId
 }
 
-func (self *Item) GetTemplate() types.Template {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return Retrieve(self.TemplateId, types.TemplateType).(types.Template)
+func (i *Item) GetTemplate() types.Template {
+	i.ReadLock()
+	defer i.ReadUnlock()
+	return Retrieve(i.TemplateId, types.TemplateType).(types.Template)
 }
 
-func (self *Item) GetName() string {
-	return self.GetTemplate().GetName()
+func (i *Item) GetName() string {
+	return i.GetTemplate().GetName()
 }
 
-func (self *Item) GetValue() int {
-	return self.GetTemplate().GetValue()
+func (i *Item) GetValue() int {
+	return i.GetTemplate().GetValue()
 }
 
-func (self *Item) GetCapacity() int {
-	return self.GetTemplate().GetCapacity()
+func (i *Item) GetCapacity() int {
+	return i.GetTemplate().GetCapacity()
 }
 
-func (self *Item) IsLocked() bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (i *Item) IsLocked() bool {
+	i.ReadLock()
+	defer i.ReadUnlock()
 
-	return self.Locked
+	return i.Locked
 }
 
-func (self *Item) SetLocked(locked bool) {
-	self.writeLock(func() {
-		self.Locked = locked
+func (i *Item) SetLocked(locked bool) {
+	i.writeLock(func() {
+		i.Locked = locked
 	})
 }
 
-func (self *Item) GetContainerId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.ContainerId
+func (i *Item) GetContainerId() types.Id {
+	i.ReadLock()
+	defer i.ReadUnlock()
+	return i.ContainerId
 }
 
-func (self *Item) SetContainerId(id types.Id, from types.Id) bool {
-	self.WriteLock()
-	if from != self.ContainerId {
-		self.WriteUnlock()
+func (i *Item) SetContainerId(id types.Id, from types.Id) bool {
+	i.WriteLock()
+	if from != i.ContainerId {
+		i.WriteUnlock()
 		return false
 	}
-	self.ContainerId = id
-	self.WriteUnlock()
-	self.syncModified()
+	i.ContainerId = id
+	i.WriteUnlock()
+	i.syncModified()
 	return true
 }

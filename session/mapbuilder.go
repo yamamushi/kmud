@@ -18,12 +18,12 @@ type mapTile struct {
 	color types.Color
 }
 
-func (self *mapTile) toString() string {
-	if self.char == ' ' {
-		return string(self.char)
+func (t *mapTile) toString() string {
+	if t.char == ' ' {
+		return string(t.char)
 	}
 
-	return types.Colorize(self.color, string(self.char))
+	return types.Colorize(t.color, string(t.char))
 }
 
 func newMapBuilder(width int, height int, depth int) mapBuilder {
@@ -57,11 +57,11 @@ func newMapBuilder(width int, height int, depth int) mapBuilder {
 	return builder
 }
 
-func (self *mapBuilder) setUserRoom(room types.Room) {
-	self.userRoom = room
+func (b *mapBuilder) setUserRoom(room types.Room) {
+	b.userRoom = room
 }
 
-func (self *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
+func (b *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 	x = x * 2
 	y = y * 2
 
@@ -71,21 +71,21 @@ func (self *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 		}
 
 		if room.HasExit(dir) {
-			self.data[z][y][x].addExit(dir)
+			b.data[z][y][x].addExit(dir)
 		}
 	}
 
-	if self.userRoom.GetId() == room.GetId() {
-		self.data[z][y][x].char = '*'
-		self.data[z][y][x].color = types.ColorRed
+	if b.userRoom.GetId() == room.GetId() {
+		b.data[z][y][x].char = '*'
+		b.data[z][y][x].color = types.ColorRed
 	} else {
-		self.data[z][y][x].color = types.ColorMagenta
+		b.data[z][y][x].color = types.ColorMagenta
 		if room.HasExit(types.DirectionUp) && room.HasExit(types.DirectionDown) {
-			self.data[z][y][x].char = '+'
+			b.data[z][y][x].char = '+'
 		} else if room.HasExit(types.DirectionUp) {
-			self.data[z][y][x].char = '^'
+			b.data[z][y][x].char = '^'
 		} else if room.HasExit(types.DirectionDown) {
-			self.data[z][y][x].char = 'v'
+			b.data[z][y][x].char = 'v'
 		} else {
 			char := '#'
 
@@ -96,8 +96,8 @@ func (self *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 				}
 			*/
 
-			self.data[z][y][x].char = char
-			self.data[z][y][x].color = types.ColorWhite
+			b.data[z][y][x].char = char
+			b.data[z][y][x].color = types.ColorWhite
 		}
 	}
 
@@ -111,15 +111,15 @@ func (self *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 	addIfExists(types.DirectionNorthWest, x-1, y-1)
 }
 
-func (self *mapBuilder) toString() string {
+func (b *mapBuilder) toString() string {
 	str := ""
 
-	for z := 0; z < self.depth; z++ {
+	for z := 0; z < b.depth; z++ {
 		var rows []string
-		for y := 0; y < self.height; y++ {
+		for y := 0; y < b.height; y++ {
 			row := ""
-			for x := 0; x < self.width; x++ {
-				tile := self.data[z][y][x].toString()
+			for x := 0; x < b.width; x++ {
+				tile := b.data[z][y][x].toString()
 				row = row + tile
 			}
 			rows = append(rows, row)
@@ -127,7 +127,7 @@ func (self *mapBuilder) toString() string {
 
 		rows = utils.TrimLowerRows(rows)
 
-		if self.depth > 1 {
+		if b.depth > 1 {
 			divider := types.Colorize(types.ColorWhite, "================================================================================\r\n")
 			rows = append(rows, divider)
 		}
@@ -140,16 +140,16 @@ func (self *mapBuilder) toString() string {
 	return str
 }
 
-func (self *mapTile) addExit(dir types.Direction) {
+func (t *mapTile) addExit(dir types.Direction) {
 	combineChars := func(r1 rune, r2 rune, r3 rune) {
-		if self.char == r1 {
-			self.char = r2
+		if t.char == r1 {
+			t.char = r2
 		} else {
-			self.char = r3
+			t.char = r3
 		}
 	}
 
-	self.color = types.ColorBlue
+	t.color = types.ColorBlue
 
 	switch dir {
 	case types.DirectionNorth:

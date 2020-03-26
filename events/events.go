@@ -182,213 +182,213 @@ type LockEvent struct {
 	Locked bool
 }
 
-func (self BroadcastEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorCyan, "Broadcast from "+self.Character.GetName()+": ") +
-		types.Colorize(types.ColorWhite, self.Message)
+func (e BroadcastEvent) ToString(receiver EventReceiver) string {
+	return types.Colorize(types.ColorCyan, "Broadcast from "+e.Character.GetName()+": ") +
+		types.Colorize(types.ColorWhite, e.Message)
 }
 
-func (self BroadcastEvent) IsFor(receiver EventReceiver) bool {
+func (e BroadcastEvent) IsFor(receiver EventReceiver) bool {
 	return true
 }
 
 // Say
-func (self SayEvent) ToString(receiver EventReceiver) string {
+func (e SayEvent) ToString(receiver EventReceiver) string {
 	who := ""
-	if receiver == self.Character {
+	if receiver == e.Character {
 		who = "You say"
 	} else {
-		who = self.Character.GetName() + " says"
+		who = e.Character.GetName() + " says"
 	}
 
 	return types.Colorize(types.ColorBlue, who+", ") +
-		types.Colorize(types.ColorWhite, "\""+self.Message+"\"")
+		types.Colorize(types.ColorWhite, "\""+e.Message+"\"")
 }
 
-func (self SayEvent) IsFor(receiver EventReceiver) bool {
-	return receiver.GetRoomId() == self.Character.GetRoomId()
+func (e SayEvent) IsFor(receiver EventReceiver) bool {
+	return receiver.GetRoomId() == e.Character.GetRoomId()
 }
 
 // Emote
-func (self EmoteEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorYellow, self.Character.GetName()+" "+self.Emote)
+func (e EmoteEvent) ToString(receiver EventReceiver) string {
+	return types.Colorize(types.ColorYellow, e.Character.GetName()+" "+e.Emote)
 }
 
-func (self EmoteEvent) IsFor(receiver EventReceiver) bool {
-	return receiver.GetRoomId() == self.Character.GetRoomId()
+func (e EmoteEvent) IsFor(receiver EventReceiver) bool {
+	return receiver.GetRoomId() == e.Character.GetRoomId()
 }
 
 // Tell
-func (self TellEvent) ToString(receiver EventReceiver) string {
-	if receiver == self.To {
+func (e TellEvent) ToString(receiver EventReceiver) string {
+	if receiver == e.To {
 		return types.Colorize(types.ColorMagenta,
-			fmt.Sprintf("Message from %s: %s", self.From.GetName(), types.Colorize(types.ColorWhite, self.Message)))
+			fmt.Sprintf("Message from %e: %e", e.From.GetName(), types.Colorize(types.ColorWhite, e.Message)))
 	} else {
 		return types.Colorize(types.ColorMagenta,
-			fmt.Sprintf("Message to %s: %s", self.To.GetName(), types.Colorize(types.ColorWhite, self.Message)))
+			fmt.Sprintf("Message to %e: %e", e.To.GetName(), types.Colorize(types.ColorWhite, e.Message)))
 	}
 }
 
-func (self TellEvent) IsFor(receiver EventReceiver) bool {
-	return receiver == self.To || receiver == self.From
+func (e TellEvent) IsFor(receiver EventReceiver) bool {
+	return receiver == e.To || receiver == e.From
 }
 
 // Enter
-func (self EnterEvent) ToString(receiver EventReceiver) string {
-	message := fmt.Sprintf("%v%s %vhas entered the room", types.ColorBlue, self.Character.GetName(), types.ColorWhite)
-	if self.Direction != types.DirectionNone {
-		message = fmt.Sprintf("%s from the %s", message, self.Direction.ToString())
+func (e EnterEvent) ToString(receiver EventReceiver) string {
+	message := fmt.Sprintf("%v%e %vhas entered the room", types.ColorBlue, e.Character.GetName(), types.ColorWhite)
+	if e.Direction != types.DirectionNone {
+		message = fmt.Sprintf("%e from the %e", message, e.Direction.ToString())
 	}
 	return message
 }
 
-func (self EnterEvent) IsFor(receiver EventReceiver) bool {
-	return self.RoomId == receiver.GetRoomId() && receiver != self.Character
+func (e EnterEvent) IsFor(receiver EventReceiver) bool {
+	return e.RoomId == receiver.GetRoomId() && receiver != e.Character
 }
 
 // Leave
-func (self LeaveEvent) ToString(receiver EventReceiver) string {
-	message := fmt.Sprintf("%v%s %vhas left the room", types.ColorBlue, self.Character.GetName(), types.ColorWhite)
-	if self.Direction != types.DirectionNone {
-		message = fmt.Sprintf("%s to the %s", message, self.Direction.ToString())
+func (e LeaveEvent) ToString(receiver EventReceiver) string {
+	message := fmt.Sprintf("%v%e %vhas left the room", types.ColorBlue, e.Character.GetName(), types.ColorWhite)
+	if e.Direction != types.DirectionNone {
+		message = fmt.Sprintf("%e to the %e", message, e.Direction.ToString())
 	}
 	return message
 }
 
-func (self LeaveEvent) IsFor(receiver EventReceiver) bool {
-	return self.RoomId == receiver.GetRoomId()
+func (e LeaveEvent) IsFor(receiver EventReceiver) bool {
+	return e.RoomId == receiver.GetRoomId()
 }
 
 // RoomUpdate
-func (self RoomUpdateEvent) ToString(receiver EventReceiver) string {
+func (e RoomUpdateEvent) ToString(receiver EventReceiver) string {
 	return types.Colorize(types.ColorWhite, "This room has been modified")
 }
 
-func (self RoomUpdateEvent) IsFor(receiver EventReceiver) bool {
-	return receiver.GetRoomId() == self.Room.GetId()
+func (e RoomUpdateEvent) IsFor(receiver EventReceiver) bool {
+	return receiver.GetRoomId() == e.Room.GetId()
 }
 
 // Login
-func (self LoginEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorBlue, self.Character.GetName()) +
+func (e LoginEvent) ToString(receiver EventReceiver) string {
+	return types.Colorize(types.ColorBlue, e.Character.GetName()) +
 		types.Colorize(types.ColorWhite, " has connected")
 }
 
-func (self LoginEvent) IsFor(receiver EventReceiver) bool {
-	return receiver != self.Character
+func (e LoginEvent) IsFor(receiver EventReceiver) bool {
+	return receiver != e.Character
 }
 
 // Logout
-func (self LogoutEvent) ToString(receiver EventReceiver) string {
-	return fmt.Sprintf("%s has disconnected", self.Character.GetName())
+func (e LogoutEvent) ToString(receiver EventReceiver) string {
+	return fmt.Sprintf("%e has disconnected", e.Character.GetName())
 }
 
-func (self LogoutEvent) IsFor(receiver EventReceiver) bool {
+func (e LogoutEvent) IsFor(receiver EventReceiver) bool {
 	return true
 }
 
 // CombatStart
-func (self CombatStartEvent) ToString(receiver EventReceiver) string {
-	if receiver == self.Attacker {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("You are attacking %s!", self.Defender.GetName()))
-	} else if receiver == self.Defender {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("%s is attacking you!", self.Attacker.GetName()))
+func (e CombatStartEvent) ToString(receiver EventReceiver) string {
+	if receiver == e.Attacker {
+		return types.Colorize(types.ColorRed, fmt.Sprintf("You are attacking %e!", e.Defender.GetName()))
+	} else if receiver == e.Defender {
+		return types.Colorize(types.ColorRed, fmt.Sprintf("%e is attacking you!", e.Attacker.GetName()))
 	}
 
 	return ""
 }
 
-func (self CombatStartEvent) IsFor(receiver EventReceiver) bool {
-	return receiver == self.Attacker || receiver == self.Defender
+func (e CombatStartEvent) IsFor(receiver EventReceiver) bool {
+	return receiver == e.Attacker || receiver == e.Defender
 }
 
 // CombatStop
-func (self CombatStopEvent) ToString(receiver EventReceiver) string {
-	if receiver == self.Attacker {
-		return types.Colorize(types.ColorGreen, fmt.Sprintf("You stopped attacking %s", self.Defender.GetName()))
-	} else if receiver == self.Defender {
-		return types.Colorize(types.ColorGreen, fmt.Sprintf("%s has stopped attacking you", self.Attacker.GetName()))
+func (e CombatStopEvent) ToString(receiver EventReceiver) string {
+	if receiver == e.Attacker {
+		return types.Colorize(types.ColorGreen, fmt.Sprintf("You stopped attacking %e", e.Defender.GetName()))
+	} else if receiver == e.Defender {
+		return types.Colorize(types.ColorGreen, fmt.Sprintf("%e has stopped attacking you", e.Attacker.GetName()))
 	}
 
 	return ""
 }
 
-func (self CombatStopEvent) IsFor(receiver EventReceiver) bool {
-	return receiver == self.Attacker || receiver == self.Defender
+func (e CombatStopEvent) IsFor(receiver EventReceiver) bool {
+	return receiver == e.Attacker || receiver == e.Defender
 }
 
 // Combat
-func (self CombatEvent) ToString(receiver EventReceiver) string {
+func (e CombatEvent) ToString(receiver EventReceiver) string {
 	skillMsg := ""
-	if self.Skill != nil {
-		skillMsg = fmt.Sprintf(" with %s", self.Skill.GetName())
+	if e.Skill != nil {
+		skillMsg = fmt.Sprintf(" with %e", e.Skill.GetName())
 	}
 
-	if receiver == self.Attacker {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("You hit %s%s for %v damage", self.Defender.GetName(), skillMsg, self.Power))
-	} else if receiver == self.Defender {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("%s hits you%s for %v damage", self.Attacker.GetName(), skillMsg, self.Power))
+	if receiver == e.Attacker {
+		return types.Colorize(types.ColorRed, fmt.Sprintf("You hit %e%e for %v damage", e.Defender.GetName(), skillMsg, e.Power))
+	} else if receiver == e.Defender {
+		return types.Colorize(types.ColorRed, fmt.Sprintf("%e hits you%e for %v damage", e.Attacker.GetName(), skillMsg, e.Power))
 	}
 
 	return ""
 }
 
-func (self CombatEvent) IsFor(receiver EventReceiver) bool {
-	return receiver == self.Attacker || receiver == self.Defender
+func (e CombatEvent) IsFor(receiver EventReceiver) bool {
+	return receiver == e.Attacker || receiver == e.Defender
 }
 
 // Timer
-func (self TickEvent) ToString(receiver EventReceiver) string {
+func (e TickEvent) ToString(receiver EventReceiver) string {
 	return ""
 }
 
-func (self TickEvent) IsFor(receiver EventReceiver) bool {
+func (e TickEvent) IsFor(receiver EventReceiver) bool {
 	return true
 }
 
 // Create
-func (self CreateEvent) ToString(receiver EventReceiver) string {
+func (e CreateEvent) ToString(receiver EventReceiver) string {
 	return ""
 }
 
-func (self CreateEvent) IsFor(receiver EventReceiver) bool {
+func (e CreateEvent) IsFor(receiver EventReceiver) bool {
 	return true
 }
 
 // Destroy
-func (self DestroyEvent) ToString(receiver EventReceiver) string {
+func (e DestroyEvent) ToString(receiver EventReceiver) string {
 	return ""
 }
 
-func (self DestroyEvent) IsFor(receiver EventReceiver) bool {
+func (e DestroyEvent) IsFor(receiver EventReceiver) bool {
 	return true
 }
 
 // Death
-func (self DeathEvent) IsFor(receiver EventReceiver) bool {
-	return receiver == self.Character ||
-		receiver.GetRoomId() == self.Character.GetRoomId()
+func (e DeathEvent) IsFor(receiver EventReceiver) bool {
+	return receiver == e.Character ||
+		receiver.GetRoomId() == e.Character.GetRoomId()
 }
 
-func (self DeathEvent) ToString(receiver EventReceiver) string {
-	if receiver == self.Character {
+func (e DeathEvent) ToString(receiver EventReceiver) string {
+	if receiver == e.Character {
 		return types.Colorize(types.ColorRed, ">> You have died")
 	}
 
-	return types.Colorize(types.ColorRed, fmt.Sprintf(">> %s has died", self.Character.GetName()))
+	return types.Colorize(types.ColorRed, fmt.Sprintf(">> %e has died", e.Character.GetName()))
 }
 
 // Lock
-func (self LockEvent) IsFor(receiver EventReceiver) bool {
-	return receiver.GetRoomId() == self.RoomId
+func (e LockEvent) IsFor(receiver EventReceiver) bool {
+	return receiver.GetRoomId() == e.RoomId
 }
 
-func (self LockEvent) ToString(receiver EventReceiver) string {
+func (e LockEvent) ToString(receiver EventReceiver) string {
 	status := "unlocked"
-	if self.Locked {
+	if e.Locked {
 		status = "locked"
 	}
 
 	return types.Colorize(types.ColorBlue,
-		fmt.Sprintf("The exit to the %s has been %s", self.Exit.ToString(),
+		fmt.Sprintf("The exit to the %e has been %e", e.Exit.ToString(),
 			types.Colorize(types.ColorWhite, status)))
 }

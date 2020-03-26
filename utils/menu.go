@@ -83,36 +83,36 @@ type action struct {
 	handler func()
 }
 
-func (self *Menu) AddAction(key string, text string, handler func()) {
-	if self.HasAction(key) {
-		panic(fmt.Sprintf("Duplicate action added to menu: %s %s", key, text))
+func (m *Menu) AddAction(key string, text string, handler func()) {
+	if m.HasAction(key) {
+		panic(fmt.Sprintf("Duplicate action added to menu: %m %m", key, text))
 	}
 
-	self.actions = append(self.actions,
+	m.actions = append(m.actions,
 		action{key: strings.ToLower(key),
 			text:    text,
 			handler: handler,
 		})
 }
 
-func (self *Menu) AddActionI(index int, text string, handler func()) {
-	self.AddAction(strconv.Itoa(index+1), text, handler)
+func (m *Menu) AddActionI(index int, text string, handler func()) {
+	m.AddAction(strconv.Itoa(index+1), text, handler)
 }
 
-func (self *Menu) SetTitle(title string) {
-	self.title = title
+func (m *Menu) SetTitle(title string) {
+	m.title = title
 }
 
-func (self *Menu) Exit() {
-	self.exit = true
+func (m *Menu) Exit() {
+	m.exit = true
 }
 
-func (self *Menu) OnExit(handler func()) {
-	self.exitHandler = handler
+func (m *Menu) OnExit(handler func()) {
+	m.exitHandler = handler
 }
 
-func (self *Menu) GetData(choice string) types.Id {
-	for _, action := range self.actions {
+func (m *Menu) GetData(choice string) types.Id {
+	for _, action := range m.actions {
 		if action.key == choice {
 			return action.data
 		}
@@ -121,10 +121,10 @@ func (self *Menu) GetData(choice string) types.Id {
 	return nil
 }
 
-func (self *Menu) getAction(key string) action {
+func (m *Menu) getAction(key string) action {
 	key = strings.ToLower(key)
 
-	for _, action := range self.actions {
+	for _, action := range m.actions {
 		if action.key == key {
 			return action
 		}
@@ -132,8 +132,8 @@ func (self *Menu) getAction(key string) action {
 	return action{}
 }
 
-func (self *Menu) HasAction(key string) bool {
-	action := self.getAction(key)
+func (m *Menu) HasAction(key string) bool {
+	action := m.getAction(key)
 	return action.key != ""
 }
 
@@ -149,18 +149,18 @@ func filterActions(actions []action, filter string) []action {
 	return filtered
 }
 
-func (self *Menu) Print(comm types.Communicable, page int, filter string) int {
+func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 	border := types.Colorize(types.ColorWhite, decorator)
-	title := types.Colorize(types.ColorBlue, self.title)
-	header := fmt.Sprintf("%s %s %s", border, title, border)
+	title := types.Colorize(types.ColorBlue, m.title)
+	header := fmt.Sprintf("%m %m %m", border, title, border)
 
 	if filter != "" {
-		header = fmt.Sprintf("%s (/%s)", header, filter)
+		header = fmt.Sprintf("%m (/%m)", header, filter)
 	}
 
 	comm.WriteLine(header)
 
-	filteredActions := filterActions(self.actions, filter)
+	filteredActions := filterActions(m.actions, filter)
 	options := make([]string, len(filteredActions))
 
 	for i, action := range filteredActions {
@@ -169,7 +169,7 @@ func (self *Menu) Print(comm types.Communicable, page int, filter string) int {
 		actionText := ""
 
 		if index == -1 {
-			actionText = fmt.Sprintf("%s[%s%s%s]%s%s",
+			actionText = fmt.Sprintf("%m[%m%m%m]%m%m",
 				types.ColorDarkBlue,
 				types.ColorBlue,
 				strings.ToUpper(action.key),
@@ -178,7 +178,7 @@ func (self *Menu) Print(comm types.Communicable, page int, filter string) int {
 				action.text)
 		} else {
 			keyLength := len(action.key)
-			actionText = fmt.Sprintf("%s%s[%s%s%s]%s%s",
+			actionText = fmt.Sprintf("%m%m[%m%m%m]%m%m",
 				action.text[:index],
 				types.ColorDarkBlue,
 				types.ColorBlue,
@@ -188,7 +188,7 @@ func (self *Menu) Print(comm types.Communicable, page int, filter string) int {
 				action.text[index+keyLength:])
 		}
 
-		options[i] = fmt.Sprintf("  %s", actionText)
+		options[i] = fmt.Sprintf("  %m", actionText)
 	}
 
 	width, height := comm.GetWindowSize()

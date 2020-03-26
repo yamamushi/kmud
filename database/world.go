@@ -25,22 +25,22 @@ type _time struct {
 	sec  int
 }
 
-func (self _time) String() string {
-	return fmt.Sprintf("%02d:%02d:%02d", self.hour, self.min, self.sec)
+func (t _time) String() string {
+	return fmt.Sprintf("%02d:%02d:%02d", t.hour, t.min, t.sec)
 }
 
 const _TIME_MULTIPLIER = 3
 
-func (self *World) GetTime() types.Time {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (w *World) GetTime() types.Time {
+	w.ReadLock()
+	defer w.ReadUnlock()
 
-	hour, min, sec := self.Time.Clock()
+	hour, min, sec := w.Time.Clock()
 	return _time{hour: hour, min: min, sec: sec}
 }
 
-func (self *World) AdvanceTime() {
-	self.writeLock(func() {
-		self.Time = self.Time.Add(3 * time.Second)
+func (w *World) AdvanceTime() {
+	w.writeLock(func() {
+		w.Time = w.Time.Add(3 * time.Second)
 	})
 }

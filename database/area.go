@@ -20,20 +20,20 @@ func NewArea(name string, zone types.Id) *Area {
 	return area
 }
 
-func (self *Area) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Name
+func (a *Area) GetName() string {
+	a.ReadLock()
+	defer a.ReadUnlock()
+	return a.Name
 }
 
-func (self *Area) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = name
+func (a *Area) SetName(name string) {
+	a.writeLock(func() {
+		a.Name = name
 	})
 }
 
-func (self *Area) GetZoneId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.ZoneId
+func (a *Area) GetZoneId() types.Id {
+	a.ReadLock()
+	defer a.ReadUnlock()
+	return a.ZoneId
 }

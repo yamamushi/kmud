@@ -33,132 +33,132 @@ func NewRoom(zoneId types.Id, location types.Coordinate) *Room {
 	return room
 }
 
-func (self *Room) HasExit(dir types.Direction) bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (r *Room) HasExit(dir types.Direction) bool {
+	r.ReadLock()
+	defer r.ReadUnlock()
 
-	_, found := self.Exits[dir]
+	_, found := r.Exits[dir]
 	return found
 }
 
-func (self *Room) SetExitEnabled(dir types.Direction, enabled bool) {
-	self.writeLock(func() {
-		if self.Exits == nil {
-			self.Exits = map[types.Direction]*Exit{}
+func (r *Room) SetExitEnabled(dir types.Direction, enabled bool) {
+	r.writeLock(func() {
+		if r.Exits == nil {
+			r.Exits = map[types.Direction]*Exit{}
 		}
 		if enabled {
-			self.Exits[dir] = &Exit{}
+			r.Exits[dir] = &Exit{}
 		} else {
-			delete(self.Exits, dir)
+			delete(r.Exits, dir)
 		}
 	})
 }
 
-func (self *Room) SetLink(name string, roomId types.Id) {
-	self.writeLock(func() {
-		if self.Links == nil {
-			self.Links = map[string]types.Id{}
+func (r *Room) SetLink(name string, roomId types.Id) {
+	r.writeLock(func() {
+		if r.Links == nil {
+			r.Links = map[string]types.Id{}
 		}
-		self.Links[name] = roomId
+		r.Links[name] = roomId
 	})
 }
 
-func (self *Room) RemoveLink(name string) {
-	self.writeLock(func() {
-		delete(self.Links, name)
+func (r *Room) RemoveLink(name string) {
+	r.writeLock(func() {
+		delete(r.Links, name)
 	})
 }
 
-func (self *Room) GetLinks() map[string]types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Links
+func (r *Room) GetLinks() map[string]types.Id {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.Links
 }
 
-func (self *Room) LinkNames() []string {
-	names := make([]string, len(self.GetLinks()))
+func (r *Room) LinkNames() []string {
+	names := make([]string, len(r.GetLinks()))
 
 	i := 0
-	for name := range self.Links {
+	for name := range r.Links {
 		names[i] = name
 		i++
 	}
 	return names
 }
 
-func (self *Room) SetTitle(title string) {
-	self.writeLock(func() {
-		self.Title = title
+func (r *Room) SetTitle(title string) {
+	r.writeLock(func() {
+		r.Title = title
 	})
 }
 
-func (self *Room) GetTitle() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Title
+func (r *Room) GetTitle() string {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.Title
 }
 
-func (self *Room) SetDescription(description string) {
-	self.writeLock(func() {
-		self.Description = description
+func (r *Room) SetDescription(description string) {
+	r.writeLock(func() {
+		r.Description = description
 	})
 }
 
-func (self *Room) GetDescription() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Description
+func (r *Room) GetDescription() string {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.Description
 }
 
-func (self *Room) SetLocation(location types.Coordinate) {
-	self.writeLock(func() {
-		self.Location = location
+func (r *Room) SetLocation(location types.Coordinate) {
+	r.writeLock(func() {
+		r.Location = location
 	})
 }
 
-func (self *Room) GetLocation() types.Coordinate {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Location
+func (r *Room) GetLocation() types.Coordinate {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.Location
 }
 
-func (self *Room) SetZoneId(zoneId types.Id) {
-	self.writeLock(func() {
-		self.ZoneId = zoneId
+func (r *Room) SetZoneId(zoneId types.Id) {
+	r.writeLock(func() {
+		r.ZoneId = zoneId
 	})
 }
 
-func (self *Room) GetZoneId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.ZoneId
+func (r *Room) GetZoneId() types.Id {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.ZoneId
 }
 
-func (self *Room) SetAreaId(areaId types.Id) {
-	self.writeLock(func() {
-		self.AreaId = areaId
+func (r *Room) SetAreaId(areaId types.Id) {
+	r.writeLock(func() {
+		r.AreaId = areaId
 	})
 }
 
-func (self *Room) GetAreaId() types.Id {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.AreaId
+func (r *Room) GetAreaId() types.Id {
+	r.ReadLock()
+	defer r.ReadUnlock()
+	return r.AreaId
 }
 
-func (self *Room) NextLocation(direction types.Direction) types.Coordinate {
-	loc := self.GetLocation()
+func (r *Room) NextLocation(direction types.Direction) types.Coordinate {
+	loc := r.GetLocation()
 	return loc.Next(direction)
 }
 
-func (self *Room) GetExits() []types.Direction {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (r *Room) GetExits() []types.Direction {
+	r.ReadLock()
+	defer r.ReadUnlock()
 
-	exits := make([]types.Direction, len(self.Exits))
+	exits := make([]types.Direction, len(r.Exits))
 
 	i := 0
-	for dir := range self.Exits {
+	for dir := range r.Exits {
 		exits[i] = dir
 		i++
 	}
@@ -166,20 +166,20 @@ func (self *Room) GetExits() []types.Direction {
 	return exits
 }
 
-func (self *Room) SetLocked(dir types.Direction, locked bool) {
-	self.writeLock(func() {
-		if self.HasExit(dir) {
-			self.Exits[dir].Locked = locked
+func (r *Room) SetLocked(dir types.Direction, locked bool) {
+	r.writeLock(func() {
+		if r.HasExit(dir) {
+			r.Exits[dir].Locked = locked
 		}
 	})
 }
 
-func (self *Room) IsLocked(dir types.Direction) bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (r *Room) IsLocked(dir types.Direction) bool {
+	r.ReadLock()
+	defer r.ReadUnlock()
 
-	if self.HasExit(dir) {
-		return self.Exits[dir].Locked
+	if r.HasExit(dir) {
+		return r.Exits[dir].Locked
 	}
 
 	return false

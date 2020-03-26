@@ -1,10 +1,13 @@
 package server
 
 import (
+	"flag"
 	"fmt"
+	"github.com/yamamushi/kmud/config"
 	"io"
 	"log"
 	"net"
+	"os"
 	"runtime/debug"
 	"sort"
 	"strconv"
@@ -22,12 +25,14 @@ import (
 
 type Server struct {
 	listener net.Listener
+	config   config.Config
 }
 
 type connectionHandler struct {
-	user types.User
-	pc   types.PC
-	conn *wrappedConnection
+	user   types.User
+	pc     types.PC
+	conn   *wrappedConnection
+	config *config.Config
 }
 
 type wrappedConnection struct {
@@ -35,17 +40,17 @@ type wrappedConnection struct {
 	watcher *utils.WatchableReadWriter
 }
 
-func (s *wrappedConnection) Write(p []byte) (int, error) {
-	return s.watcher.Write(p)
+func (wc *wrappedConnection) Write(p []byte) (int, error) {
+	return wc.watcher.Write(p)
 }
 
-func (s *wrappedConnection) Read(p []byte) (int, error) {
-	return s.watcher.Read(p)
+func (wc *wrappedConnection) Read(p []byte) (int, error) {
+	return wc.watcher.Read(p)
 }
 
-func login(conn *wrappedConnection) types.User {
+func login(wc *wrappedConnection) types.User {
 	for {
-		username := utils.GetUserInput(conn, "Username: ", types.ColorModeNone)
+		username := utils.GetUserInput(wc, "Username: ", types.ColorModeNone)
 
 		if username == "" {
 			return nil
@@ -54,14 +59,14 @@ func login(conn *wrappedConnection) types.User {
 		user := model.GetUserByName(username)
 
 		if user == nil {
-			utils.WriteLine(conn, "User not found", types.ColorModeNone)
+			utils.WriteLine(wc, "User not found", types.ColorModeNone)
 		} else if user.IsOnline() {
-			utils.WriteLine(conn, "That user is already online", types.ColorModeNone)
+			utils.WriteLine(wc, "That user is already online", types.ColorModeNone)
 		} else {
 			attempts := 1
-			conn.WillEcho()
+			wc.WillEcho()
 			for {
-				password := utils.GetRawUserInputSuffix(conn, "Password: ", "\r\n", types.ColorModeNone)
+				password := utils.GetRawUserInputSuffix(wc, "Password: ", "\r\n", types.ColorModeNone)
 
 				// TODO - Disabling password verification to make development easier
 				if user.VerifyPassword(password) || true {
@@ -69,26 +74,26 @@ func login(conn *wrappedConnection) types.User {
 				}
 
 				if attempts >= 3 {
-					utils.WriteLine(conn, "Too many failed login attempts", types.ColorModeNone)
-					conn.Close()
+					utils.WriteLine(wc, "Too many failed login attempts", types.ColorModeNone)
+					wc.Close()
 					panic("Booted user due to too many failed logins (" + user.GetName() + ")")
 				}
 
 				attempts++
 
 				time.Sleep(2 * time.Second)
-				utils.WriteLine(conn, "Invalid password", types.ColorModeNone)
+				utils.WriteLine(wc, "Invalid password", types.ColorModeNone)
 			}
-			conn.WontEcho()
+			wc.WontEcho()
 
 			return user
 		}
 	}
 }
 
-func newUser(conn *wrappedConnection) types.User {
+func newUser(wc *wrappedConnection) types.User {
 	for {
-		name := utils.GetUserInput(conn, "Desired username: ", types.ColorModeNone)
+		name := utils.GetUserInput(wc, "Desired username: ", types.ColorModeNone)
 
 		if name == "" {
 			return nil
@@ -98,23 +103,23 @@ func newUser(conn *wrappedConnection) types.User {
 		password := ""
 
 		if user != nil {
-			utils.WriteLine(conn, "That name is unavailable", types.ColorModeNone)
+			utils.WriteLine(wc, "That name is unavailable", types.ColorModeNone)
 		} else if err := utils.ValidateName(name); err != nil {
-			utils.WriteLine(conn, err.Error(), types.ColorModeNone)
+			utils.WriteLine(wc, err.Error(), types.ColorModeNone)
 		} else {
-			conn.WillEcho()
+			wc.WillEcho()
 			for {
-				pass1 := utils.GetRawUserInputSuffix(conn, "Desired password: ", "\r\n", types.ColorModeNone)
+				pass1 := utils.GetRawUserInputSuffix(wc, "Desired password: ", "\r\n", types.ColorModeNone)
 
 				if len(pass1) < 7 {
-					utils.WriteLine(conn, "Passwords must be at least 7 letters in length", types.ColorModeNone)
+					utils.WriteLine(wc, "Passwords must be at least 7 letters in length", types.ColorModeNone)
 					continue
 				}
 
-				pass2 := utils.GetRawUserInputSuffix(conn, "Confirm password: ", "\r\n", types.ColorModeNone)
+				pass2 := utils.GetRawUserInputSuffix(wc, "Confirm password: ", "\r\n", types.ColorModeNone)
 
 				if pass1 != pass2 {
-					utils.WriteLine(conn, "Passwords do not match", types.ColorModeNone)
+					utils.WriteLine(wc, "Passwords do not match", types.ColorModeNone)
 					continue
 				}
 
@@ -122,7 +127,7 @@ func newUser(conn *wrappedConnection) types.User {
 
 				break
 			}
-			conn.WontEcho()
+			wc.WontEcho()
 
 			admin := model.UserCount() == 0
 			user = model.CreateUser(name, password, admin)
@@ -131,11 +136,11 @@ func newUser(conn *wrappedConnection) types.User {
 	}
 }
 
-func (self *connectionHandler) newPlayer() types.PC {
+func (c *connectionHandler) newPlayer() types.PC {
 	// TODO: character slot limit
 	const SizeLimit = 12
 	for {
-		name := self.user.GetInput("Desired character name: ")
+		name := c.user.GetInput("Desired character name: ")
 
 		if name == "" {
 			return nil
@@ -144,100 +149,110 @@ func (self *connectionHandler) newPlayer() types.PC {
 		char := model.GetCharacterByName(name)
 
 		if char != nil {
-			self.user.WriteLine("That name is unavailable")
+			c.user.WriteLine("That name is unavailable")
 		} else if err := utils.ValidateName(name); err != nil {
-			self.user.WriteLine(err.Error())
+			c.user.WriteLine(err.Error())
 		} else {
 			room := model.GetRooms()[0] // TODO: Better way to pick an initial character location
-			return model.CreatePlayerCharacter(name, self.user.GetId(), room)
+			return model.CreatePlayerCharacter(name, c.user.GetId(), room)
 		}
 	}
 }
 
-func (self *connectionHandler) WriteLine(line string, a ...interface{}) {
-	utils.WriteLine(self.conn, fmt.Sprintf(line, a...), types.ColorModeNone)
+func (c *connectionHandler) WriteLine(line string, a ...interface{}) {
+	utils.WriteLine(c.conn, fmt.Sprintf(line, a...), types.ColorModeNone)
 }
 
-func (self *connectionHandler) Write(text string) {
-	utils.Write(self.conn, text, types.ColorModeNone)
+func (c *connectionHandler) Write(text string) {
+	utils.Write(c.conn, text, types.ColorModeNone)
 }
 
-func (self *connectionHandler) GetInput(prompt string) string {
-	return utils.GetUserInput(self.conn, prompt, types.ColorModeNone)
+func (c *connectionHandler) GetInput(prompt string) string {
+	return utils.GetUserInput(c.conn, prompt, types.ColorModeNone)
 }
 
-func (sefl *connectionHandler) GetWindowSize() (int, int) {
+func (c *connectionHandler) GetWindowSize() (int, int) {
 	return 80, 80
 }
 
-func (self *connectionHandler) mainMenu() {
+func (c *connectionHandler) mainMenu() {
 	utils.ExecMenu(
 		"MUD",
-		self,
+		c,
 		func(menu *utils.Menu) {
 			menu.AddAction("l", "Login", func() {
-				self.user = login(self.conn)
-				self.loggedIn()
+				c.user = login(c.conn)
+				c.loggedIn()
 			})
 
 			menu.AddAction("n", "New user", func() {
-				self.user = newUser(self.conn)
-				self.loggedIn()
+				c.user = newUser(c.conn)
+				c.loggedIn()
+			})
+
+			menu.AddAction("q", "Disconnect", func() {
+				menu.Exit()
+				return
 			})
 
 			menu.OnExit(func() {
-				utils.WriteLine(self.conn, "Take luck!", types.ColorModeNone)
-				self.conn.Close()
+				utils.WriteLine(c.conn, "Take luck!", types.ColorModeNone)
+				c.conn.Close()
+				return
 			})
 		})
 }
 
-func (self *connectionHandler) userMenu() {
+func (c *connectionHandler) userMenu() {
 	utils.ExecMenu(
-		self.user.GetName(),
-		self.user,
+		c.user.GetName(),
+		c.user,
 		func(menu *utils.Menu) {
 			menu.OnExit(func() {
-				self.user.SetOnline(false)
-				self.user = nil
+				c.user.SetOnline(false)
+				c.user = nil
 			})
 
-			if self.user.IsAdmin() {
+			if c.user.IsAdmin() {
 				menu.AddAction("a", "Admin", func() {
-					self.adminMenu()
+					c.adminMenu()
 				})
 			}
 
 			menu.AddAction("n", "New character", func() {
-				self.pc = self.newPlayer()
+				c.pc = c.newPlayer()
+			})
+
+			menu.AddAction("q", "logout", func() {
+				menu.Exit()
+				return
 			})
 
 			// TODO: Sort character list
-			chars := model.GetUserCharacters(self.user.GetId())
+			chars := model.GetUserCharacters(c.user.GetId())
 
 			if len(chars) > 0 {
 				menu.AddAction("d", "Delete character", func() {
-					self.deleteMenu()
+					c.deleteMenu()
 				})
 			}
 
 			for i, char := range chars {
-				c := char
 				menu.AddAction(strconv.Itoa(i+1), char.GetName(), func() {
-					self.pc = c
-					self.launchSession()
+					c.pc = char
+					c.launchSession()
 				})
 			}
 		})
 }
 
-func (self *connectionHandler) deleteMenu() {
+func (c *connectionHandler) deleteMenu() {
 	utils.ExecMenu(
 		"Delete character",
-		self.user,
+		c.user,
 		func(menu *utils.Menu) {
 			// TODO: Sort character list
-			chars := model.GetUserCharacters(self.user.GetId())
+			chars := model.GetUserCharacters(c.user.GetId())
 			for i, char := range chars {
 				c := char
 				menu.AddAction(strconv.Itoa(i+1), char.GetName(), func() {
@@ -245,22 +260,30 @@ func (self *connectionHandler) deleteMenu() {
 					model.DeleteCharacter(c.GetId())
 				})
 			}
-		})
-}
 
-func (self *connectionHandler) adminMenu() {
-	utils.ExecMenu(
-		"Admin",
-		self.user,
-		func(menu *utils.Menu) {
-			menu.AddAction("u", "Users", func() {
-				self.userAdminMenu()
+			menu.AddAction("q", "Return to previous menu", func() {
+				menu.Exit()
 			})
 		})
 }
 
-func (self *connectionHandler) userAdminMenu() {
-	utils.ExecMenu("User Admin", self.user, func(menu *utils.Menu) {
+func (c *connectionHandler) adminMenu() {
+	utils.ExecMenu(
+		"Admin",
+		c.user,
+		func(menu *utils.Menu) {
+			menu.AddAction("u", "Users", func() {
+				c.userAdminMenu()
+			})
+
+			menu.AddAction("q", "Return to previous menu", func() {
+				menu.Exit()
+			})
+		})
+}
+
+func (c *connectionHandler) userAdminMenu() {
+	utils.ExecMenu("User Admin", c.user, func(menu *utils.Menu) {
 		users := model.GetUsers()
 		sort.Sort(users)
 
@@ -272,13 +295,17 @@ func (self *connectionHandler) userAdminMenu() {
 
 			u := user
 			menu.AddAction(strconv.Itoa(i+1), user.GetName()+online, func() {
-				self.specificUserMenu(u)
+				c.specificUserMenu(u)
 			})
 		}
+
+		menu.AddAction("q", "Return to previous menu", func() {
+			menu.Exit()
+		})
 	})
 }
 
-func (self *connectionHandler) specificUserMenu(user types.User) {
+func (c *connectionHandler) specificUserMenu(user types.User) {
 	suffix := ""
 	if user.IsOnline() {
 		suffix = "(Online)"
@@ -287,8 +314,8 @@ func (self *connectionHandler) specificUserMenu(user types.User) {
 	}
 
 	utils.ExecMenu(
-		fmt.Sprintf("User: %s %s", user.GetName(), suffix),
-		self.user,
+		fmt.Sprintf("User: %c %c", user.GetName(), suffix),
+		c.user,
 		func(menu *utils.Menu) {
 			menu.AddAction("d", "Delete", func() {
 				model.DeleteUser(user.GetId())
@@ -300,25 +327,29 @@ func (self *connectionHandler) specificUserMenu(user types.User) {
 				u.SetAdmin(!u.IsAdmin())
 			})
 
+			menu.AddAction("q", "Return to previous menu", func() {
+				menu.Exit()
+			})
+
 			if user.IsOnline() {
 				menu.AddAction("w", "Watch", func() {
-					if user == self.user {
-						self.user.WriteLine("You can't watch yourself!")
+					if user == c.user {
+						c.user.WriteLine("You can't watch yours!")
 					} else {
 						userConn := user.GetConnection().(*wrappedConnection)
 
-						userConn.watcher.AddWatcher(self.conn)
-						utils.GetRawUserInput(self.conn, "Type anything to stop watching\r\n", self.user.GetColorMode())
-						userConn.watcher.RemoveWatcher(self.conn)
+						userConn.watcher.AddWatcher(c.conn)
+						utils.GetRawUserInput(c.conn, "Type anything to stop watching\r\n", c.user.GetColorMode())
+						userConn.watcher.RemoveWatcher(c.conn)
 					}
 				})
 			}
 		})
 }
 
-func (self *connectionHandler) Handle() {
+func (c *connectionHandler) Handle() {
 	go func() {
-		defer self.conn.Close()
+		defer c.conn.Close()
 
 		defer func() {
 			r := recover()
@@ -326,43 +357,49 @@ func (self *connectionHandler) Handle() {
 			username := ""
 			charname := ""
 
-			if self.user != nil {
-				self.user.SetOnline(false)
-				username = self.user.GetName()
+			if c.user != nil {
+				c.user.SetOnline(false)
+				username = c.user.GetName()
 			}
 
-			if self.pc != nil {
-				self.pc.SetOnline(false)
-				charname = self.pc.GetName()
+			if c.pc != nil {
+				c.pc.SetOnline(false)
+				charname = c.pc.GetName()
 			}
 
-			if r != io.EOF {
+			if r != io.EOF && c.config.Server.Debug {
 				debug.PrintStack()
 			}
 
-			log.Println("Lost connection to client (%v/%v): %v, %v\n",
-				username,
-				charname,
-				self.conn.RemoteAddr(),
-				r)
+			if username != "" && charname != "" {
+				output := fmt.Sprintf("Lost connection to client (%v/%v): %v, %v",
+					username,
+					charname,
+					c.conn.RemoteAddr(), r)
+				log.Println(output)
+			} else {
+				output := fmt.Sprintf("Lost connection to client: %v", c.conn.RemoteAddr())
+				log.Println(output)
+			}
+
 		}()
 
-		self.mainMenu()
+		c.mainMenu()
 	}()
 }
 
-func (self *connectionHandler) loggedIn() {
-	if self.user == nil {
+func (c *connectionHandler) loggedIn() {
+	if c.user == nil {
 		return
 	}
 
-	self.user.SetOnline(true)
-	self.user.SetConnection(self.conn)
+	c.user.SetOnline(true)
+	c.user.SetConnection(c.conn)
 
-	self.conn.DoWindowSize()
-	self.conn.DoTerminalType()
+	c.conn.DoWindowSize()
+	c.conn.DoTerminalType()
 
-	self.conn.Listen(func(code telnet.TelnetCode, data []byte) {
+	c.conn.Listen(func(code telnet.TelnetCode, data []byte) {
 		switch code {
 		case telnet.WS:
 			if len(data) != 4 {
@@ -372,41 +409,58 @@ func (self *connectionHandler) loggedIn() {
 
 			width := int((255 * data[0])) + int(data[1])
 			height := int((255 * data[2])) + int(data[3])
-			self.user.SetWindowSize(width, height)
+			c.user.SetWindowSize(width, height)
 
 		case telnet.TT:
-			self.user.SetTerminalType(string(data))
+			c.user.SetTerminalType(string(data))
 		}
 	})
 
-	self.userMenu()
+	c.userMenu()
 }
 
-func (self *connectionHandler) launchSession() {
-	if self.pc == nil {
+func (c *connectionHandler) launchSession() {
+	if c.pc == nil {
 		return
 	}
 
-	session := session.NewSession(self.conn, self.user, self.pc)
+	session := session.NewSession(c.conn, c.user, c.pc)
 	session.Exec()
-	self.pc = nil
+	c.pc = nil
 }
 
-func (self *Server) Start() {
-	log.Println("Connecting to database... ")
-	session, err := mgo.Dial("localhost")
+func (s *Server) ReadConfig() {
+	var confPath string
+	flag.StringVar(&confPath, "c", "kmud.conf", "Path to Config File")
+	flag.Parse()
 
+	_, err := os.Stat(confPath)
+	if err != nil {
+		log.Fatal("Config file is missing: ", confPath)
+		os.Exit(1)
+	}
+
+	s.config, err = config.ReadConfig(confPath)
 	utils.HandleError(err)
+}
 
-	log.Println("done.")
+func (s *Server) Start() {
+	log.Println("Connecting to database... ")
+	session, err := mgo.Dial(s.config.DB.MongoHost)
+	utils.HandleError(err)
+	log.Println("Database Connection Established")
 
-	self.listener, err = net.Listen("tcp", ":8945")
+	address := s.config.Server.Interface + ":" + s.config.Server.Port
+	log.Println("Establishing Connection on " + address)
+	s.listener, err = net.Listen("tcp", address)
 	utils.HandleError(err)
 
 	database.Init(database.NewMongoSession(session.Copy()), "mud")
+	log.Println("Database Initialized")
+
 }
 
-func (self *Server) Bootstrap() {
+func (s *Server) Bootstrap() {
 	// Create the world object if necessary
 	model.GetWorld()
 
@@ -427,9 +481,9 @@ func (self *Server) Bootstrap() {
 	}
 }
 
-func (self *Server) Listen() {
+func (s *Server) Listen() {
 	for {
-		conn, err := self.listener.Accept()
+		conn, err := s.listener.Accept()
 		utils.HandleError(err)
 		log.Println("Client connected:", conn.RemoteAddr())
 		t := telnet.NewTelnet(conn)
@@ -437,16 +491,22 @@ func (self *Server) Listen() {
 		wc := utils.NewWatchableReadWriter(t)
 
 		ch := connectionHandler{
-			conn: &wrappedConnection{Telnet: *t, watcher: wc},
+			config: &s.config,
+			conn:   &wrappedConnection{Telnet: *t, watcher: wc},
 		}
 
 		ch.Handle()
 	}
 }
 
-func (self *Server) Exec() {
-	self.Start()
-	self.Bootstrap()
+func (s *Server) Exec() {
+	s.ReadConfig()
+	log.Println("Starting Server Setup")
+	s.Start()
+	log.Println("Bootstrapping World")
+	s.Bootstrap()
+	log.Println("Starting World Engine")
 	engine.Start()
-	self.Listen()
+	log.Println("Listening for Connections...")
+	s.Listen()
 }

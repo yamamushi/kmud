@@ -41,41 +41,41 @@ func NewUser(name string, password string, admin bool) *User {
 	return user
 }
 
-func (self *User) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
+func (u *User) GetName() string {
+	u.ReadLock()
+	defer u.ReadUnlock()
 
-	return self.Name
+	return u.Name
 }
 
-func (self *User) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (u *User) SetName(name string) {
+	u.writeLock(func() {
+		u.Name = utils.FormatName(name)
 	})
 }
 
-func (self *User) SetOnline(online bool) {
-	self.online = online
+func (u *User) SetOnline(online bool) {
+	u.online = online
 
 	if !online {
-		self.conn = nil
+		u.conn = nil
 	}
 }
 
-func (self *User) IsOnline() bool {
-	return self.online
+func (u *User) IsOnline() bool {
+	return u.online
 }
 
-func (self *User) SetColorMode(cm types.ColorMode) {
-	self.writeLock(func() {
-		self.ColorMode = cm
+func (u *User) SetColorMode(cm types.ColorMode) {
+	u.writeLock(func() {
+		u.ColorMode = cm
 	})
 }
 
-func (self *User) GetColorMode() types.ColorMode {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.ColorMode
+func (u *User) GetColorMode() types.ColorMode {
+	u.ReadLock()
+	defer u.ReadUnlock()
+	return u.ColorMode
 }
 
 func hash(data string) []byte {
@@ -85,73 +85,73 @@ func hash(data string) []byte {
 }
 
 // SetPassword SHA1 hashes the password before saving it to the database
-func (self *User) SetPassword(password string) {
-	self.writeLock(func() {
-		self.Password = hash(password)
+func (u *User) SetPassword(password string) {
+	u.writeLock(func() {
+		u.Password = hash(password)
 	})
 }
 
-func (self *User) VerifyPassword(password string) bool {
+func (u *User) VerifyPassword(password string) bool {
 	hashed := hash(password)
-	return reflect.DeepEqual(hashed, self.GetPassword())
+	return reflect.DeepEqual(hashed, u.GetPassword())
 }
 
 // GetPassword returns the SHA1 of the user's password
-func (self *User) GetPassword() []byte {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Password
+func (u *User) GetPassword() []byte {
+	u.ReadLock()
+	defer u.ReadUnlock()
+	return u.Password
 }
 
-func (self *User) SetConnection(conn net.Conn) {
-	self.conn = conn
+func (u *User) SetConnection(conn net.Conn) {
+	u.conn = conn
 }
 
-func (self *User) GetConnection() net.Conn {
-	return self.conn
+func (u *User) GetConnection() net.Conn {
+	return u.conn
 }
 
-func (self *User) SetWindowSize(width int, height int) {
-	self.windowWidth = width
-	self.windowHeight = height
+func (u *User) SetWindowSize(width int, height int) {
+	u.windowWidth = width
+	u.windowHeight = height
 }
 
 const MinWidth = 60
 const MinHeight = 20
 
-func (self *User) GetWindowSize() (width int, height int) {
-	return utils.Max(self.windowWidth, MinWidth),
-		utils.Max(self.windowHeight, MinHeight)
+func (u *User) GetWindowSize() (width int, height int) {
+	return utils.Max(u.windowWidth, MinWidth),
+		utils.Max(u.windowHeight, MinHeight)
 }
 
-func (self *User) SetTerminalType(tt string) {
-	self.terminalType = tt
+func (u *User) SetTerminalType(tt string) {
+	u.terminalType = tt
 }
 
-func (self *User) GetTerminalType() string {
-	return self.terminalType
+func (u *User) GetTerminalType() string {
+	return u.terminalType
 }
 
-func (self *User) GetInput(prompt string) string {
-	return utils.GetUserInput(self.conn, prompt, self.GetColorMode())
+func (u *User) GetInput(prompt string) string {
+	return utils.GetUserInput(u.conn, prompt, u.GetColorMode())
 }
 
-func (self *User) WriteLine(line string, a ...interface{}) {
-	utils.WriteLine(self.conn, fmt.Sprintf(line, a...), self.GetColorMode())
+func (u *User) WriteLine(line string, a ...interface{}) {
+	utils.WriteLine(u.conn, fmt.Sprintf(line, a...), u.GetColorMode())
 }
 
-func (self *User) Write(text string) {
-	utils.Write(self.conn, text, self.GetColorMode())
+func (u *User) Write(text string) {
+	utils.Write(u.conn, text, u.GetColorMode())
 }
 
-func (self *User) SetAdmin(admin bool) {
-	self.writeLock(func() {
-		self.Admin = admin
+func (u *User) SetAdmin(admin bool) {
+	u.writeLock(func() {
+		u.Admin = admin
 	})
 }
 
-func (self *User) IsAdmin() bool {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Admin
+func (u *User) IsAdmin() bool {
+	u.ReadLock()
+	defer u.ReadUnlock()
+	return u.Admin
 }

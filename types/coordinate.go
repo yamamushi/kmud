@@ -64,8 +64,8 @@ func StringToDirection(str string) Direction {
 	return DirectionNone
 }
 
-func (dir Direction) ToString() string {
-	switch dir {
+func (d Direction) ToString() string {
+	switch d {
 	case DirectionNorth:
 		return "North"
 	case DirectionNorthEast:
@@ -93,8 +93,8 @@ func (dir Direction) ToString() string {
 	panic("Unexpected code path")
 }
 
-func (self Direction) Opposite() Direction {
-	switch self {
+func (d Direction) Opposite() Direction {
+	switch d {
 	case DirectionNorth:
 		return DirectionSouth
 	case DirectionNorthEast:
@@ -120,8 +120,8 @@ func (self Direction) Opposite() Direction {
 	return DirectionNone
 }
 
-func (self *Coordinate) Next(direction Direction) Coordinate {
-	newCoord := *self
+func (c *Coordinate) Next(direction Direction) Coordinate {
+	newCoord := *c
 	switch direction {
 	case DirectionNorth:
 		newCoord.Y -= 1

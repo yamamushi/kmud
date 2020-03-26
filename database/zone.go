@@ -17,14 +17,14 @@ func NewZone(name string) *Zone {
 	return zone
 }
 
-func (self *Zone) GetName() string {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Name
+func (z *Zone) GetName() string {
+	z.ReadLock()
+	defer z.ReadUnlock()
+	return z.Name
 }
 
-func (self *Zone) SetName(name string) {
-	self.writeLock(func() {
-		self.Name = utils.FormatName(name)
+func (z *Zone) SetName(name string) {
+	z.writeLock(func() {
+		z.Name = utils.FormatName(name)
 	})
 }

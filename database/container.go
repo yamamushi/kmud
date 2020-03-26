@@ -7,34 +7,34 @@ type Container struct {
 	Weight   int
 }
 
-func (self *Container) SetCash(cash int) {
-	self.writeLock(func() {
-		self.Cash = cash
+func (c *Container) SetCash(cash int) {
+	c.writeLock(func() {
+		c.Cash = cash
 	})
 }
 
-func (self *Container) GetCash() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Cash
+func (c *Container) GetCash() int {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.Cash
 }
 
-func (self *Container) AddCash(amount int) {
-	self.SetCash(self.GetCash() + amount)
+func (c *Container) AddCash(amount int) {
+	c.SetCash(c.GetCash() + amount)
 }
 
-func (self *Container) RemoveCash(amount int) {
-	self.SetCash(self.GetCash() - amount)
+func (c *Container) RemoveCash(amount int) {
+	c.SetCash(c.GetCash() - amount)
 }
 
-func (self *Container) GetCapacity() int {
-	self.ReadLock()
-	defer self.ReadUnlock()
-	return self.Capacity
+func (c *Container) GetCapacity() int {
+	c.ReadLock()
+	defer c.ReadUnlock()
+	return c.Capacity
 }
 
-func (self *Container) SetCapacity(limit int) {
-	self.writeLock(func() {
-		self.Capacity = limit
+func (c *Container) SetCapacity(limit int) {
+	c.writeLock(func() {
+		c.Capacity = limit
 	})
 }
