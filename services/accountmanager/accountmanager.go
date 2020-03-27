@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/yamamushi/kmud-2020/database"
 	"log"
 	"net/http"
 
@@ -18,23 +19,32 @@ func main() {
 		utils.HandleError(err)
 	}
 
+	db := database.NewDatabaseHandler(conf)
+
 	log.Println("Creating endpoint handlers")
 	svc := accountManagerService{}
 	authHandler := httptransport.NewServer(
-		makeAuthEndpoint(svc),
+		makeAuthEndpoint(svc, conf, db),
 		decodeAuthRequest,
 		encodeResponse,
 	)
 
 	accountInfoHandler := httptransport.NewServer(
-		makeAccountInfoEndpoint(svc),
+		makeAccountInfoEndpoint(svc, conf, db),
 		decodeAccountInfoRequest,
+		encodeResponse,
+	)
+
+	accountRegistrationHandler := httptransport.NewServer(
+		makeAccountRegistrationEndpoint(svc, conf, db),
+		decodeAccountRegistrationRequest,
 		encodeResponse,
 	)
 
 	log.Println("Registering endpoint handlers")
 	http.Handle("/auth", authHandler)
 	http.Handle("/accountinfo", accountInfoHandler)
+	http.Handle("/register", accountRegistrationHandler)
 
 	log.Println("Listening for connections...")
 	err = http.ListenAndServe(conf.Server.Interface+":"+conf.Server.Port, nil)

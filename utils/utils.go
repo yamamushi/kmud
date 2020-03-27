@@ -511,3 +511,36 @@ func Filter(list []string, pattern string) []string {
 func FilterItem(item, pattern string) bool {
 	return strings.Contains(strings.ToLower(types.StripColors(item)), strings.ToLower(pattern))
 }
+
+func RemoveLast(input string, check string) string {
+	if len(check) == 0 {
+		return input
+	}
+	if len(input) > 0 && input[len(input)-1] == check[0] {
+		input = input[:len(input)-1]
+	}
+	return input
+}
+
+func RemoveLastChar(input string) string {
+	if len(input) > 0 {
+		input = input[:len(input)-1]
+	}
+	return input
+}
+
+func RemoveStringArray(input string, check string) string {
+	if len(check) == 0 {
+		return input
+	}
+
+	for _, ch := range check {
+		input = strings.Replace(input, string(ch), "", -1)
+	}
+	return input
+}
+
+func RemoveSpecial(input string) string {
+	input = RemoveStringArray(input, "=/\\|+-!$#%^&*//()_`~:;\"'[]{}<>,.@")
+	return input
+}

@@ -5,17 +5,20 @@ import (
 	"flag"
 	"github.com/BurntSushi/toml"
 	"os"
+	"sync"
 )
 
 // Config struct
 type Config struct {
 	Server serverConfig   `toml:"server"`
 	DB     databaseConfig `toml:"database"`
+	Crypt  cryptConfig    `toml:"crypt"`
 }
+
+var configquerylocker sync.Mutex
 
 // read function
 func read(path string) (config *Config, err error) {
-
 	conf := &Config{}
 	if _, err := toml.DecodeFile(path, conf); err != nil {
 		return nil, err
@@ -26,6 +29,9 @@ func read(path string) (config *Config, err error) {
 
 // GetConfig function
 func GetConfig(name string) (conf *Config, err error) {
+	configquerylocker.Lock()
+	defer configquerylocker.Unlock()
+
 	var confPath string
 	flag.StringVar(&confPath, "c", name, "Path to Config File")
 	flag.Parse()
@@ -58,4 +64,8 @@ type serverConfig struct {
 	Interface    string `toml:"interface"`
 	Debug        bool   `toml:"debug"`
 	LoggingLevel string `toml:"verbosity"`
+}
+
+type cryptConfig struct {
+	AccountManagerSecret string `toml:"account_manager_secret"`
 }

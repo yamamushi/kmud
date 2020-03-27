@@ -1,0 +1,19 @@
+[server]
+
+port = "4242"
+interface = "localhost"
+debug = false
+verbosity = "all"
+
+
+[database]
+
+mongohost = "localhost"
+mongodb = "kmud"
+mongouser = ""
+mongopass = ""
+
+
+[crypt]
+
+account_manager_secret = "secret"

@@ -32,7 +32,7 @@ func (s *ModelSuite) SetUpSuite(c *C) {
 
 	session.DB(dbName).DropDatabase()
 
-	database.Init(database.NewMongoSession(session), dbName)
+	olddatabase.Init(olddatabase.NewMongoSession(session), dbName)
 }
 
 func (s *ModelSuite) TearDownSuite(c *C) {

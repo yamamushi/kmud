@@ -15,25 +15,25 @@ import (
 type TestSession struct {
 }
 
-func (ms TestSession) DB(dbName string) database.Database {
+func (ms TestSession) DB(dbName string) olddatabase.Database {
 	return &TestDatabase{}
 }
 
 type TestDatabase struct {
 }
 
-func (md TestDatabase) C(collectionName string) database.Collection {
+func (md TestDatabase) C(collectionName string) olddatabase.Collection {
 	return &TestCollection{}
 }
 
 type TestCollection struct {
 }
 
-func (mc TestCollection) Find(selector interface{}) database.Query {
+func (mc TestCollection) Find(selector interface{}) olddatabase.Query {
 	return &TestQuery{}
 }
 
-func (mc TestCollection) FindId(selector interface{}) database.Query {
+func (mc TestCollection) FindId(selector interface{}) olddatabase.Query {
 	return &TestQuery{}
 }
 
@@ -68,7 +68,7 @@ func (mq TestQuery) One(result interface{}) error {
 	return nil
 }
 
-func (mq TestQuery) Iter() database.Iterator {
+func (mq TestQuery) Iter() olddatabase.Iterator {
 	return &TestIterator{}
 }
 
@@ -81,9 +81,9 @@ func (mi TestIterator) All(result interface{}) error {
 
 func Test_ThreadSafety(t *testing.T) {
 	runtime.GOMAXPROCS(2)
-	database.Init(&TestSession{}, "unit_dbtest")
+	olddatabase.Init(&TestSession{}, "unit_dbtest")
 
-	char := database.NewPc("test", testutils.MockId(""), testutils.MockId(""))
+	char := olddatabase.NewPc("test", testutils.MockId(""), testutils.MockId(""))
 
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -105,7 +105,7 @@ func Test_ThreadSafety(t *testing.T) {
 }
 
 func Test_User(t *testing.T) {
-	user := database.NewUser("testuser", "", false)
+	user := olddatabase.NewUser("testuser", "", false)
 
 	if user.IsOnline() {
 		t.Errorf("Newly created user shouldn't be online")
@@ -145,7 +145,7 @@ func Test_User(t *testing.T) {
 
 func Test_PlayerCharacter(t *testing.T) {
 	fakeId := bson.ObjectId("12345")
-	character := database.NewPc("testcharacter", fakeId, fakeId)
+	character := olddatabase.NewPc("testcharacter", fakeId, fakeId)
 
 	testutils.Assert(character.GetUserId() == fakeId, t, "Call to character.SetUser() failed", fakeId, character.GetUserId())
 	testutils.Assert(!character.IsOnline(), t, "Player-Characters should be offline by default")
@@ -208,14 +208,14 @@ func Test_PlayerCharacter(t *testing.T) {
 
 func Test_Zone(t *testing.T) {
 	zoneName := "testzone"
-	zone := database.NewZone(zoneName)
+	zone := olddatabase.NewZone(zoneName)
 
 	testutils.Assert(zone.GetName() == zoneName, t, "Zone didn't have correct name upon creation", zoneName, zone.GetName())
 }
 
 func Test_Room(t *testing.T) {
 	fakeZoneId := bson.ObjectId("!2345")
-	room := database.NewRoom(fakeZoneId, types.Coordinate{X: 0, Y: 0, Z: 0})
+	room := olddatabase.NewRoom(fakeZoneId, types.Coordinate{X: 0, Y: 0, Z: 0})
 
 	testutils.Assert(room.GetZoneId() == fakeZoneId, t, "Room didn't have correct zone ID upon creation", fakeZoneId, room.GetZoneId())
 
@@ -253,8 +253,8 @@ func Test_Room(t *testing.T) {
 
 func Test_Item(t *testing.T) {
 	name := "test_item"
-	template := database.NewTemplate(name)
-	item := database.NewItem(template.GetId())
+	template := olddatabase.NewTemplate(name)
+	item := olddatabase.NewItem(template.GetId())
 
 	testutils.Assert(item.GetName() == name, t, "Item didn't get created with correct name", name, item.GetName())
 }

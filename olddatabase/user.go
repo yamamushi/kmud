@@ -1,4 +1,4 @@
-package database
+package olddatabase
 
 import (
 	"crypto/sha1"

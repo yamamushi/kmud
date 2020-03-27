@@ -1,4 +1,4 @@
-package database
+package olddatabase
 
 import "github.com/yamamushi/kmud-2020/utils"
 

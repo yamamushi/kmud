@@ -103,11 +103,11 @@ type Event interface {
 type TickEvent struct{}
 
 type CreateEvent struct {
-	Object *database.DbObject
+	Object *olddatabase.DbObject
 }
 
 type DestroyEvent struct {
-	Object *database.DbObject
+	Object *olddatabase.DbObject
 }
 
 type DeathEvent struct {
@@ -148,7 +148,7 @@ type LeaveEvent struct {
 }
 
 type RoomUpdateEvent struct {
-	Room *database.Room
+	Room *olddatabase.Room
 }
 
 type LoginEvent struct {
