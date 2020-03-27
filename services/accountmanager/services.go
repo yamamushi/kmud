@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"errors"
+	"github.com/badoux/checkmail"
 	"github.com/yamamushi/kmud-2020/config"
 	"github.com/yamamushi/kmud-2020/database"
 	"github.com/yamamushi/kmud-2020/types"
@@ -15,6 +16,7 @@ type AccountManagerService interface {
 	Auth(string, string, string, *config.Config, *database.DatabaseHandler) (string, error)
 	AccountInfo(string, string, string, *config.Config, *database.DatabaseHandler) (types.Account, error)
 	AccountRegistration(string, string, string, string, *config.Config, *database.DatabaseHandler) error
+	Search(string, string, types.Account, *config.Config, *database.DatabaseHandler) ([]types.Account, error)
 }
 
 type accountManagerService struct {
@@ -35,7 +37,7 @@ func (accountManagerService) Auth(secret string, username string, hashedpass str
 			return "", err
 		}
 	}
-	account = BsonMapToAccount(result)
+	account = utils.BsonMapToAccount(result)
 	inputPass := hex.EncodeToString([]byte(hashedpass))
 
 	if inputPass != account.HashedPass {
@@ -61,31 +63,9 @@ func (accountManagerService) Auth(secret string, username string, hashedpass str
 
 func (accountManagerService) AccountInfo(secret string, token string, field string, conf *config.Config, DB *database.DatabaseHandler) (types.Account, error) {
 
-	if secret != conf.Crypt.AccountManagerSecret {
-		return types.Account{}, errors.New("unauthorized request")
-	}
-
-	tokenfields := strings.Split(token, ":")
-	if len(tokenfields) != 2 {
-		return types.Account{}, errors.New("invalid token format")
-	}
-
-	if field == "" {
-		field = "all"
-	}
-
-	result, err := DB.FindOne(bson.M{"username": tokenfields[0]}, conf.DB.MongoDB, "accounts")
+	accountStruct, err := utils.ValidateRequest(secret, token, "", "moderators", conf, DB)
 	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			return types.Account{}, errors.New("unauthorized request")
-		} else {
-			return types.Account{}, err
-		}
-	}
-
-	accountStruct := BsonMapToAccount(result)
-	if accountStruct.Token != tokenfields[1] {
-		return types.Account{}, errors.New("unauthorized request")
+		return types.Account{}, err
 	}
 
 	output := types.Account{}
@@ -133,6 +113,16 @@ func (accountManagerService) AccountRegistration(secret string, username string,
 		return errors.New("invalid request")
 	}
 
+	err = checkmail.ValidateFormat(email)
+	if err != nil {
+		return errors.New("invalid email format")
+	}
+
+	err = checkmail.ValidateHost(email)
+	if err != nil {
+		return errors.New("invalid email domain")
+	}
+
 	_, err = DB.FindOne(bson.M{"username": username}, conf.DB.MongoDB, "accounts")
 	if err != nil {
 		if err.Error() != "mongo: no documents in result" {
@@ -152,10 +142,33 @@ func (accountManagerService) AccountRegistration(secret string, username string,
 	}
 
 	hexPass := hex.EncodeToString([]byte(hashedpass))
-	err = DB.Insert(types.Account{Username: username, Email: email, HashedPass: hexPass, Locked: "false", Permissions: []string{"user"}}, conf.DB.MongoDB, "accounts")
+	err = DB.Insert(types.Account{Username: username, Email: email, HashedPass: hexPass, Locked: "false", Permissions: []string{"user"}, Groups: []string{"default"}}, conf.DB.MongoDB, "accounts")
 	if err != nil {
 		return err
 	}
 
 	return utils.EmptyError()
+}
+
+func (accountManagerService) Search(secret string, token string, inputAccount types.Account, conf *config.Config, DB *database.DatabaseHandler) ([]types.Account, error) {
+
+	_, err := utils.ValidateRequest(secret, token, "moderators", "", conf, DB)
+	if err != nil {
+		return []types.Account{}, err
+	}
+
+	input := utils.AccountToBson(inputAccount)
+	results, err := DB.FindAll(input, conf.DB.MongoDB, "accounts")
+	if err != nil {
+		return []types.Account{}, errors.New("unauthorized request")
+	}
+
+	var output []types.Account
+	for _, result := range results {
+		converted := utils.BsonMapToAccount(result)
+		converted.Token = ""
+		converted.HashedPass = ""
+		output = append(output, converted)
+	}
+	return output, utils.EmptyError()
 }

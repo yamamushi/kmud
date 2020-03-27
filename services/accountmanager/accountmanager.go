@@ -41,10 +41,28 @@ func main() {
 		encodeResponse,
 	)
 
+	// Account Search
+	searchHandler := httptransport.NewServer(
+		makeSearchEndpoint(svc, conf, db),
+		decodeSearchRequest,
+		encodeResponse,
+	)
+
+	/*
+		- ModifyCharacters
+		- ModifyPermissions
+		- ToggleAccountLock
+		- ModifyEmail
+		- ModifyUsername
+		- GetAccountByFilter (filter by email, character, username)
+		- Add permissions checking for accountinfo command
+	*/
+
 	log.Println("Registering endpoint handlers")
 	http.Handle("/auth", authHandler)
 	http.Handle("/accountinfo", accountInfoHandler)
 	http.Handle("/register", accountRegistrationHandler)
+	http.Handle("/search", searchHandler)
 
 	log.Println("Listening for connections...")
 	err = http.ListenAndServe(conf.Server.Interface+":"+conf.Server.Port, nil)

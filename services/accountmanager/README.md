@@ -16,7 +16,7 @@ Will also return account information.
             
         Response:
             AuthToken: (string) Account Auth Token
-            Error: Error status
+            Error: (string) Error status
     
     
     /accountinfo
@@ -27,8 +27,8 @@ Will also return account information.
             Field: (string) Target field(s) - Accepts all, email, permissions, characters, locked  
             
         Response: 
-            Account: An account object with requested field(s)
-            Error: Error status 
+            Account: (types.Account) An account object with requested field(s)
+            Error: (string) Error status 
             
             
     /register
@@ -40,7 +40,18 @@ Will also return account information.
             Email: (string) Account Email Address
             
         Response:
-            Error: Error status (empty on success)
+            Error: (string) Error status (empty on success)
+            
+    
+    /search
+    
+        Request: Secret: (string) Secret shared token used by frontend service for Auth.
+        AuthToken: (string) User Account Auth Token
+        Account: (types.Account) Formatted account object to filter by
+        
+        Response:
+            Accounts: ([]types.Account)   
+            Error: (string) Error status (empty on success)  
             
 ## Examples
 
@@ -104,4 +115,37 @@ Example Errors
     
     {"account":{},"error":"unrecognized fields: foobar"}
 
+    
+### Search For Account
+
+    curl -XPOST -d'{"secret":"secret","token":"accountusername:H5rHuz382PfIVfLCt4EuKsJRohyrK5SuiyqyTErEo","account":{"permissions":["user"]}}' localhost:4242/search
+    
+Output
+
+    {
+    	"accounts": [{
+    		"username": "me",
+    		"email": "me@email.com",
+    		"hashedpass": "74657374",
+    		"permissions": ["user"],
+    		"groups": ["default"],
+    		"characters": ["mycharacter1"],
+    		"locked": "false",
+    	}, {
+    		"username": "you",
+    		"email": "you@mail.com",
+    		"hashedpass": "74657374",
+    		"permissions": ["user"],
+            "groups": ["default"],
+            "locked": "false",
+    	}]
+    }
+
+Example Errors
+
+    {"accounts":[],"error":"unauthorized request"}
+    
+    {"account":{},"error":"invalid token format"}
+    
+    
     

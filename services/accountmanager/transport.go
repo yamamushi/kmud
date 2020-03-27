@@ -37,6 +37,14 @@ func makeAccountRegistrationEndpoint(svc AccountManagerService, conf *config.Con
 	}
 }
 
+func makeSearchEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(searchRequest)
+		account, err := svc.Search(req.Secret, req.Token, req.Account, conf, db)
+		return searchResponse{Accounts: account, Err: err.Error()}, nil
+	}
+}
+
 func decodeAuthRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var request authRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -55,6 +63,14 @@ func decodeAccountInfoRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func decodeAccountRegistrationRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var request accountRegistrationRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	return request, nil
+}
+
+func decodeSearchRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request searchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -96,4 +112,15 @@ type accountRegistrationRequest struct {
 
 type accountRegistrationResponse struct {
 	Err string `json:"error"` // errors don't JSON-marshal, so we use a string
+}
+
+type searchRequest struct {
+	Secret  string        `json:"secret"`
+	Token   string        `json:"token"`
+	Account types.Account `json:"account"`
+}
+
+type searchResponse struct {
+	Accounts []types.Account `json:"accounts"`
+	Err      string          `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
 }
