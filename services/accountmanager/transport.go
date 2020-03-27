@@ -11,7 +11,7 @@ import (
 func makeAuthEndpoint(svc AccountManagerService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(authRequest)
-		token, err := svc.Auth(req.Username, req.HashedPass)
+		token, err := svc.Auth(req.Secret, req.Username, req.HashedPass)
 		if err != nil {
 			return authResponse{token, err.Error()}, nil
 		}
@@ -22,7 +22,7 @@ func makeAuthEndpoint(svc AccountManagerService) endpoint.Endpoint {
 func makeAccountInfoEndpoint(svc AccountManagerService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(accountInfoRequest)
-		field, err := svc.AccountInfo(req.AuthToken, req.Account, req.Field)
+		field, err := svc.AccountInfo(req.Secret, req.AuthToken, req.Account, req.Field)
 		return accountInfoResponse{Account: field, Err: err.Error()}, nil
 	}
 }
@@ -48,6 +48,7 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 }
 
 type authRequest struct {
+	Secret     string `json:"secret"`
 	Username   string `json:"username"`
 	HashedPass string `json:"hashedpass"`
 }
@@ -58,6 +59,7 @@ type authResponse struct {
 }
 
 type accountInfoRequest struct {
+	Secret    string `json:"secret"`
 	AuthToken string `json:"authtoken"`
 	Account   string `json:"account"`
 	Field     string `json:"field"`

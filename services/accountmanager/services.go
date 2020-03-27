@@ -6,13 +6,13 @@ import (
 )
 
 type AccountManagerService interface {
-	Auth(string, string) (string, error)
-	AccountInfo(string, string, string) (types.Account, error)
+	Auth(string, string, string) (string, error)
+	AccountInfo(string, string, string, string) (types.Account, error)
 }
 
 type accountManagerService struct{}
 
-func (accountManagerService) Auth(username string, hashedpass string) (string, error) {
+func (accountManagerService) Auth(secret string, username string, hashedpass string) (string, error) {
 
 	// Check Hashed Pass
 	// Write token to table entry
@@ -21,7 +21,7 @@ func (accountManagerService) Auth(username string, hashedpass string) (string, e
 	return "username:sha256token", utils.EmptyError()
 }
 
-func (accountManagerService) AccountInfo(token string, account string, field string) (types.Account, error) {
+func (accountManagerService) AccountInfo(secret string, token string, account string, field string) (types.Account, error) {
 
 	return types.Account{Username: "Test", Email: "test@test.com"}, utils.EmptyError()
 }

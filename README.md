@@ -6,7 +6,7 @@ A refactor and update of [kmud](https://github.com/Cristofori/kmud) written in G
 Development
 ===========
 
-The current development priority is splitting the project into services that can be run independently in docker/kubernetes.  
+The current development priority is splitting the project into microservices that can be run independently in docker/kubernetes.  
 
 For the week of March 26th, 2020:
     
@@ -14,6 +14,15 @@ For the week of March 26th, 2020:
     
     The focus of this service is a passthrough frontend that can communicate with backend services. "Frontend" delivers all telnet interaction with clients. 
     
+    
+* AccountManager
+
+    Handles account authorizations, account information retrieval, account modifications and registrations.
+    
+
+* UserManager
+    
+    Manages the list of logged-in users using redis.
     
 
 
@@ -26,14 +35,17 @@ go install github.com/yamamushi/kmud
 
 Dependencies
 ============
-Google Go v1.2
-MongoDB: www.mongodb.org 
+    Google Go v1.2
+    MongoDB: www.mongodb.org 
 
-mgo: http://labix.org/mgo
-go get gopkg.in/mgo.v2
+    mgo: http://labix.org/mgo
+    go get gopkg.in/mgo.v2
 
-go check: http://labix.org/gocheck
-go get gopkg.in/check.v1
+    go check: http://labix.org/gocheck
+    go get gopkg.in/check.v1
+
+    go-kit: https://gokit.io/
+    go get github.com/go-kit/kit
 
 
 Roadmap
