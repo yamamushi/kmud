@@ -1,6 +1,6 @@
 package database
 
-import "github.com/yamamushi/kmud/utils"
+import "github.com/yamamushi/kmud-2020/utils"
 
 type Zone struct {
 	DbObject `bson:",inline"`

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 type World struct {

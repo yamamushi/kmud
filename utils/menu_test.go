@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/yamamushi/kmud/testutils"
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/testutils"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 func Test_Menu(t *testing.T) {

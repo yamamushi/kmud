@@ -1,8 +1,10 @@
 package config
 
 import (
+	"errors"
+	"flag"
 	"github.com/BurntSushi/toml"
-	"log"
+	"os"
 )
 
 // Config struct
@@ -11,13 +13,31 @@ type Config struct {
 	DB     databaseConfig `toml:"database"`
 }
 
-// ReadConfig function
-func ReadConfig(path string) (config Config, err error) {
+// read function
+func read(path string) (config *Config, err error) {
 
-	var conf Config
-	if _, err := toml.DecodeFile(path, &conf); err != nil {
-		log.Println(err)
-		return conf, err
+	conf := &Config{}
+	if _, err := toml.DecodeFile(path, conf); err != nil {
+		return nil, err
+	}
+
+	return conf, nil
+}
+
+// GetConfig function
+func GetConfig(name string) (conf *Config, err error) {
+	var confPath string
+	flag.StringVar(&confPath, "c", name, "Path to Config File")
+	flag.Parse()
+
+	_, err = os.Stat(confPath)
+	if err != nil {
+		return nil, errors.New("Config file is missing: " + confPath)
+	}
+
+	conf, err = read(confPath)
+	if err != nil {
+		return nil, errors.New("Error reading config file: " + confPath + " - " + err.Error())
 	}
 
 	return conf, nil
@@ -34,7 +54,8 @@ type databaseConfig struct {
 
 // serverConfig struct
 type serverConfig struct {
-	Port      string `toml:"port"`
-	Interface string `toml:"interface"`
-	Debug     bool   `toml:"debug"`
+	Port         string `toml:"port"`
+	Interface    string `toml:"interface"`
+	Debug        bool   `toml:"debug"`
+	LoggingLevel string `toml:"verbosity"`
 }

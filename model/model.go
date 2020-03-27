@@ -5,10 +5,10 @@ import (
 	"log"
 	"sort"
 
-	db "github.com/yamamushi/kmud/database"
-	"github.com/yamamushi/kmud/events"
-	"github.com/yamamushi/kmud/types"
-	"github.com/yamamushi/kmud/utils"
+	db "github.com/yamamushi/kmud-2020/database"
+	"github.com/yamamushi/kmud-2020/events"
+	"github.com/yamamushi/kmud-2020/types"
+	"github.com/yamamushi/kmud-2020/utils"
 	"gopkg.in/mgo.v2/bson"
 )
 

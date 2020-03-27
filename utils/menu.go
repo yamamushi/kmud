@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 const decorator = "-=-=-"
@@ -85,7 +85,7 @@ type action struct {
 
 func (m *Menu) AddAction(key string, text string, handler func()) {
 	if m.HasAction(key) {
-		panic(fmt.Sprintf("Duplicate action added to menu: %m %m", key, text))
+		panic(fmt.Sprintf("Duplicate action added to menu: %s %s", key, text))
 	}
 
 	m.actions = append(m.actions,
@@ -152,10 +152,10 @@ func filterActions(actions []action, filter string) []action {
 func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 	border := types.Colorize(types.ColorWhite, decorator)
 	title := types.Colorize(types.ColorBlue, m.title)
-	header := fmt.Sprintf("%m %m %m", border, title, border)
+	header := fmt.Sprintf("%s %s %s", border, title, border)
 
 	if filter != "" {
-		header = fmt.Sprintf("%m (/%m)", header, filter)
+		header = fmt.Sprintf("%s (/%s)", header, filter)
 	}
 
 	comm.WriteLine(header)
@@ -169,7 +169,7 @@ func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 		actionText := ""
 
 		if index == -1 {
-			actionText = fmt.Sprintf("%m[%m%m%m]%m%m",
+			actionText = fmt.Sprintf("%s[%s%s%s]%s%s",
 				types.ColorDarkBlue,
 				types.ColorBlue,
 				strings.ToUpper(action.key),
@@ -178,7 +178,7 @@ func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 				action.text)
 		} else {
 			keyLength := len(action.key)
-			actionText = fmt.Sprintf("%m%m[%m%m%m]%m%m",
+			actionText = fmt.Sprintf("%s%s[%s%s%s]%s%s",
 				action.text[:index],
 				types.ColorDarkBlue,
 				types.ColorBlue,
@@ -188,7 +188,7 @@ func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 				action.text[index+keyLength:])
 		}
 
-		options[i] = fmt.Sprintf("  %m", actionText)
+		options[i] = fmt.Sprintf("  %s", actionText)
 	}
 
 	width, height := comm.GetWindowSize()

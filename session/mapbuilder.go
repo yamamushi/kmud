@@ -1,8 +1,8 @@
 package session
 
 import (
-	"github.com/yamamushi/kmud/types"
-	"github.com/yamamushi/kmud/utils"
+	"github.com/yamamushi/kmud-2020/types"
+	"github.com/yamamushi/kmud-2020/utils"
 )
 
 type mapBuilder struct {

@@ -1,6 +1,6 @@
 package database
 
-import "github.com/yamamushi/kmud/types"
+import "github.com/yamamushi/kmud-2020/types"
 
 type Exit struct {
 	Locked bool

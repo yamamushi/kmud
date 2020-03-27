@@ -3,9 +3,9 @@ package model
 import (
 	"testing"
 
-	"github.com/yamamushi/kmud/database"
-	"github.com/yamamushi/kmud/datastore"
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/database"
+	"github.com/yamamushi/kmud-2020/datastore"
+	"github.com/yamamushi/kmud-2020/types"
 	. "gopkg.in/check.v1"
 	"gopkg.in/mgo.v2"
 )

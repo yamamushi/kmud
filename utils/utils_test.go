@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yamamushi/kmud/testutils"
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/testutils"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 func Test_WriteLine(t *testing.T) {

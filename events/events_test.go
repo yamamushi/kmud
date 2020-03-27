@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yamamushi/kmud/testutils"
+	"github.com/yamamushi/kmud-2020/testutils"
 	. "gopkg.in/check.v1"
 )
 

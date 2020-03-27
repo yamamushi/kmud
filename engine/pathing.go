@@ -3,9 +3,9 @@ package engine
 import (
 	"math"
 
-	"github.com/yamamushi/kmud/model"
-	"github.com/yamamushi/kmud/types"
-	"github.com/yamamushi/kmud/utils"
+	"github.com/yamamushi/kmud-2020/model"
+	"github.com/yamamushi/kmud-2020/types"
+	"github.com/yamamushi/kmud-2020/utils"
 )
 
 func costEstimate(start, goal types.Room) int {

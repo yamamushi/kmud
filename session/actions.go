@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yamamushi/kmud/combat"
-	"github.com/yamamushi/kmud/events"
-	"github.com/yamamushi/kmud/model"
-	"github.com/yamamushi/kmud/types"
-	"github.com/yamamushi/kmud/utils"
+	"github.com/yamamushi/kmud-2020/combat"
+	"github.com/yamamushi/kmud-2020/events"
+	"github.com/yamamushi/kmud-2020/model"
+	"github.com/yamamushi/kmud-2020/types"
+	"github.com/yamamushi/kmud-2020/utils"
 )
 
 type action struct {

@@ -3,7 +3,7 @@ package datastore
 import (
 	"sync"
 
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 var _data map[types.Id]types.Object

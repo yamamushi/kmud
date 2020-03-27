@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/yamamushi/kmud/types"
+	"github.com/yamamushi/kmud-2020/types"
 )
 
 type Prompter interface {
