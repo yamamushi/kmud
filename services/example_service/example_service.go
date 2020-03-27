@@ -13,28 +13,28 @@ import (
 func main() {
 
 	log.Println("Checking config")
-	conf, err := config.GetConfig("accountmanager.conf")
+	conf, err := config.GetConfig("frontend.conf")
 	if err != nil {
 		utils.HandleError(err)
 	}
 
 	log.Println("Creating endpoint handlers")
-	svc := accountManagerService{}
-	authHandler := httptransport.NewServer(
-		makeAuthEndpoint(svc),
-		decodeAuthRequest,
+	svc := stringService{}
+	uppercaseHandler := httptransport.NewServer(
+		makeUppercaseEndpoint(svc),
+		decodeUppercaseRequest,
 		encodeResponse,
 	)
 
-	accountInfoHandler := httptransport.NewServer(
-		makeAccountInfoEndpoint(svc),
-		decodeAccountInfoRequest,
+	countHandler := httptransport.NewServer(
+		makeCountEndpoint(svc),
+		decodeCountRequest,
 		encodeResponse,
 	)
 
 	log.Println("Registering endpoint handlers")
-	http.Handle("/auth", authHandler)
-	http.Handle("/accountinfo", accountInfoHandler)
+	http.Handle("/uppercase", uppercaseHandler)
+	http.Handle("/count", countHandler)
 
 	log.Println("Listening for connections...")
 	err = http.ListenAndServe(conf.Server.Interface+":"+conf.Server.Port, nil)

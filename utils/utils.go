@@ -114,6 +114,10 @@ func HandleError(err error) {
 	}
 }
 
+func EmptyError() error {
+	return errors.New("")
+}
+
 func FormatName(name string) string {
 	if name == "" {
 		return name
