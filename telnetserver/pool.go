@@ -79,21 +79,20 @@ func (p *ConnectionPool) Run() {
 	}
 }
 
-func (p *ConnectionPool) CleanUp() {
-	p.locker.Lock()
-	defer p.locker.Unlock()
-
-	for _, conn := range p.pool {
-		if conn == nil {
-			_ = p.RemoveFromPool(conn)
-		}
-	}
-}
-
 func (p *ConnectionPool) ParseMessage(message PoolMessage) {
-	message.Type = strings.ToLower(message.Type)
-	if message.Type == "disconnected" {
+	if message.Type == "" {
+		return
+	}
 
+	message.Type = strings.ToLower(message.Type)
+	if message.Type == "disconnect" {
+		if len(p.pool) > 0 {
+			for _, conn := range p.pool {
+				if conn.id == message.TargetID {
+					p.HandlePoolError(conn, conn.conn.Close())
+				}
+			}
+		}
 	}
 	if message.Type == "broadcast" {
 		if len(message.Args) > 0 {
@@ -101,6 +100,7 @@ func (p *ConnectionPool) ParseMessage(message PoolMessage) {
 				for _, conn := range p.pool {
 					if conn != nil {
 						err := utils.WriteLine(conn.conn, message.Args[0], types.ColorModeNone)
+						//conn.conn.Telnet.Write([]byte("\033[H\033[2J"))
 						p.HandlePoolError(conn, err)
 						err = utils.Write(conn.conn, "> ", types.ColorModeNone)
 						p.HandlePoolError(conn, err)

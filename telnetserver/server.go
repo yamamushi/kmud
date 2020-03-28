@@ -81,7 +81,7 @@ func (s *Server) Run(runner func(c *ConnectionHandler, conf *config.Config), con
 	log.Println("Creating Connection Pool")
 	s.CreateConnectionPool()
 
-	go s.TestBroadcastLoop()
+	//go s.TestBroadcastLoop()
 
 	log.Println("Listening for Connections...")
 	s.Listen(runner, conf)

@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -32,6 +33,13 @@ func mainMenu(c *telnetserver.ConnectionHandler, conf *config.Config) {
 
 			menu.AddAction("n", "New user", func() {
 				_ = registerUserHandler(c.GetConn(), conf)
+			})
+
+			menu.AddAction("t", "Testing", func() {
+				x, y, err := c.GetConn().DoWindowSize()
+				if err == nil {
+					log.Println("X:" + strconv.Itoa(x) + " - Y:" + strconv.Itoa(y))
+				}
 			})
 
 			menu.AddAction("q", "Disconnect", func() {
