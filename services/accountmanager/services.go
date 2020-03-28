@@ -93,6 +93,10 @@ func (accountManagerService) AccountInfo(secret string, token string, field stri
 			output.Locked = accountStruct.Locked
 			found = true
 		}
+		if filter == "requirepasswordreset" || filter == "all" {
+			output.RequirePasswordReset = accountStruct.RequirePasswordReset
+			found = true
+		}
 		if !found {
 			unrecognized = unrecognized + filter + ","
 		}
@@ -144,7 +148,7 @@ func (accountManagerService) AccountRegistration(secret string, username string,
 	}
 
 	hexPass := hex.EncodeToString([]byte(hashedpass))
-	err = DB.Insert(types.Account{Username: username, Email: email, HashedPass: hexPass, Locked: "false", Permissions: []string{"user"}, Groups: []string{"default"}}, conf.DB.MongoDB, "accounts")
+	err = DB.Insert(types.Account{Username: username, Email: email, HashedPass: hexPass, Locked: "false", RequirePasswordReset: "false", Permissions: []string{"user"}, Groups: []string{"default"}}, conf.DB.MongoDB, "accounts")
 	if err != nil {
 		return err
 	}
@@ -174,7 +178,6 @@ func (accountManagerService) Search(secret string, token string, inputAccount ty
 	}
 	return output, utils.EmptyError()
 }
-
 
 func (accountManagerService) Modify(secret string, token string, inputAccount types.Account, conf *config.Config, DB *database.DatabaseHandler) (types.Account, error) {
 

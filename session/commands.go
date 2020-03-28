@@ -102,7 +102,7 @@ func init() {
 				s.execMenu(
 					"Room",
 					func(menu *utils.Menu) {
-						menu.AddAction("t", fmt.Sprintf("Title - %s", s.GetRoom().GetTitle()), func() {
+						menu.AddAction("t", fmt.Sprintf("ServerName - %s", s.GetRoom().GetTitle()), func() {
 							title := s.getRawUserInput("Enter new title: ")
 							if title != "" {
 								s.GetRoom().SetTitle(title)

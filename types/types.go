@@ -72,7 +72,6 @@ type Object interface {
 	SetId(Id)
 }
 
-
 type PC interface {
 	Character
 	Loginable

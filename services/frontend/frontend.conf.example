@@ -21,3 +21,7 @@ account_manager_secret = "secret"
 
 account_manager_hostname = "localhost:4242"
 frontend_hostname = "localhost:4200"
+
+[game]
+
+server_name = "kmud-202"

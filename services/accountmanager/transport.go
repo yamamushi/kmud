@@ -12,49 +12,49 @@ import (
 
 func makeAuthEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(authRequest)
+		req := request.(types.AuthRequest)
 		token, err := svc.Auth(req.Secret, req.Username, req.HashedPass, conf, db)
 		if err != nil {
-			return authResponse{token, err.Error()}, nil
+			return types.AuthResponse{token, err.Error()}, nil
 		}
-		return authResponse{token, ""}, nil
+		return types.AuthResponse{token, ""}, nil
 	}
 }
 
 func makeAccountInfoEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(accountInfoRequest)
+		req := request.(types.AccountInfoRequest)
 		field, err := svc.AccountInfo(req.Secret, req.Token, req.Field, conf, db)
-		return accountInfoResponse{Account: field, Err: err.Error()}, nil
+		return types.AccountInfoResponse{Account: field, Err: err.Error()}, nil
 	}
 }
 
 func makeAccountRegistrationEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(accountRegistrationRequest)
+		req := request.(types.AccountRegistrationRequest)
 		err := svc.AccountRegistration(req.Secret, req.Username, req.Email, req.HashedPass, conf, db)
-		return accountRegistrationResponse{Err: err.Error()}, nil
+		return types.AccountRegistrationResponse{Err: err.Error()}, nil
 	}
 }
 
 func makeSearchEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(searchRequest)
+		req := request.(types.SearchRequest)
 		accounts, err := svc.Search(req.Secret, req.Token, req.Account, conf, db)
-		return searchResponse{Accounts: accounts, Err: err.Error()}, nil
+		return types.SearchResponse{Accounts: accounts, Err: err.Error()}, nil
 	}
 }
 
 func makeModifyEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(modifyRequest)
+		req := request.(types.ModifyRequest)
 		account, err := svc.Modify(req.Secret, req.Token, req.Account, conf, db)
-		return modifyResponse{Account: account, Err: err.Error()}, nil
+		return types.ModifyResponse{Account: account, Err: err.Error()}, nil
 	}
 }
 
 func decodeAuthRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request authRequest
+	var request types.AuthRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func decodeAuthRequest(_ context.Context, r *http.Request) (interface{}, error) 
 }
 
 func decodeAccountInfoRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request accountInfoRequest
+	var request types.AccountInfoRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func decodeAccountInfoRequest(_ context.Context, r *http.Request) (interface{}, 
 }
 
 func decodeAccountRegistrationRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request accountRegistrationRequest
+	var request types.AccountRegistrationRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func decodeAccountRegistrationRequest(_ context.Context, r *http.Request) (inter
 }
 
 func decodeModifyRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request modifyRequest
+	var request types.ModifyRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func decodeModifyRequest(_ context.Context, r *http.Request) (interface{}, error
 }
 
 func decodeSearchRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request searchRequest
+	var request types.SearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -95,59 +95,4 @@ func decodeSearchRequest(_ context.Context, r *http.Request) (interface{}, error
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
-}
-
-type authRequest struct {
-	Secret     string `json:"secret"`
-	Username   string `json:"username"`
-	HashedPass string `json:"hashedpass"`
-}
-
-type authResponse struct {
-	AuthToken string `json:"authtoken"`
-	Err       string `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
-}
-
-type accountInfoRequest struct {
-	Secret string `json:"secret"`
-	Token  string `json:"token"`
-	Field  string `json:"field"`
-}
-
-type accountInfoResponse struct {
-	Account types.Account `json:"account"`
-	Err     string        `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
-}
-
-type accountRegistrationRequest struct {
-	Secret     string `json:"secret"`
-	Username   string `json:"username"`
-	HashedPass string `json:"hashedpass"`
-	Email      string `json:"email"`
-}
-
-type accountRegistrationResponse struct {
-	Err string `json:"error"` // errors don't JSON-marshal, so we use a string
-}
-
-type searchRequest struct {
-	Secret  string        `json:"secret"`
-	Token   string        `json:"token"`
-	Account types.Account `json:"account"`
-}
-
-type searchResponse struct {
-	Accounts []types.Account `json:"accounts"`
-	Err      string          `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
-}
-
-type modifyRequest struct {
-	Secret  string        `json:"secret"`
-	Token   string        `json:"token"`
-	Account types.Account `json:"account"`
-}
-
-type modifyResponse struct {
-	Account types.Account   `json:"account"`
-	Err      string          `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
 }

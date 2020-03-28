@@ -27,6 +27,9 @@ func BsonMapToAccount(input bson.D) (account types.Account) {
 	if input.Map()["locked"] != nil {
 		account.Locked = input.Map()["locked"].(string)
 	}
+	if input.Map()["requirepasswordreset"] != nil {
+		account.RequirePasswordReset = input.Map()["requirepasswordreset"].(string)
+	}
 	if input.Map()["permissions"] != nil {
 		permissions := input.Map()["permissions"].(primitive.A)
 		for _, permission := range permissions {
@@ -65,6 +68,9 @@ func AccountToBson(input types.Account) (output bson.M) {
 	}
 	if input.Locked != "" {
 		output["locked"] = input.Locked
+	}
+	if input.RequirePasswordReset != "" {
+		output["requirepasswordreset"] = input.RequirePasswordReset
 	}
 	if len(input.Characters) > 0 {
 		characters := primitive.A{}

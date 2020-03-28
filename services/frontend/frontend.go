@@ -26,5 +26,3 @@ func main() {
 	// All connections (the functionality will vary depending on the service)
 	s.Run(mainMenu, conf)
 }
-
-

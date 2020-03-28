@@ -238,7 +238,7 @@ func Test_Room(t *testing.T) {
 		testutils.Assert(!room.HasExit(dir), t, "Call to room.SetExitEnabled(false) failed")
 	}
 
-	title := "Test Title"
+	title := "Test ServerName"
 	room.SetTitle(title)
 	testutils.Assert(title == room.GetTitle(), t, "Call to room.SetTitle() failed", title, room.GetTitle())
 
