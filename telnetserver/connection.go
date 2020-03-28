@@ -14,10 +14,11 @@ import (
 )
 
 type ConnectionHandler struct {
-	user   types.User
-	pc     types.PC
-	conn   *WrappedConnection
-	config *config.Config
+	id        string
+	AuthToken string
+	pool      chan PoolMessage
+	conn      *WrappedConnection
+	config    *config.Config
 }
 
 type WrappedConnection struct {
@@ -70,6 +71,8 @@ func (c *ConnectionHandler) HandleDisconnect() {
 		output := fmt.Sprintf("Lost connection to client: %v", c.conn.RemoteAddr())
 		log.Println(output)
 	}
+
+	c.pool <- PoolMessage{TargetID: c.id, Type: "disconnected"}
 }
 
 func (c *ConnectionHandler) Close() {

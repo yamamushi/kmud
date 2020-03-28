@@ -37,20 +37,20 @@ func SimplePrompter(prompt string) Prompter {
 	return &prompter
 }
 
-func Write(conn io.Writer, text string, cm types.ColorMode) {
+func Write(conn io.Writer, text string, cm types.ColorMode) error {
 	_, err := conn.Write([]byte(types.ProcessColors(text, cm)))
-	HandleError(err)
+	return err
 }
 
-func WriteLine(conn io.Writer, line string, cm types.ColorMode) {
-	Write(conn, line+"\r\n", cm)
+func WriteLine(conn io.Writer, line string, cm types.ColorMode) error {
+	return Write(conn, line+"\r\n", cm)
 }
 
 // ClearLine sends the VT100 code for erasing the line followed by a carriage
 // return to move the cursor back to the beginning of the line
-func ClearLine(conn io.Writer) {
+func ClearLine(conn io.Writer) error {
 	clearline := "\x1B[2K"
-	Write(conn, clearline+"\r", types.ColorModeNone)
+	return Write(conn, clearline+"\r", types.ColorModeNone)
 }
 
 func Simplify(str string) string {
@@ -107,10 +107,14 @@ func GetUserInput(conn io.ReadWriter, prompt string, cm types.ColorMode) string 
 	return Simplify(input)
 }
 
+func Error(err string) {
+	HandleError(errors.New(err))
+}
+
 func HandleError(err error) {
 	if err != nil {
 		log.Printf("Error: %s", err)
-		panic(err)
+		//panic(err)
 	}
 }
 

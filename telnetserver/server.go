@@ -1,8 +1,10 @@
 package telnetserver
 
 import (
+	"errors"
 	"log"
 	"net"
+	"time"
 
 	"github.com/yamamushi/kmud-2020/config"
 	"github.com/yamamushi/kmud-2020/telnet"
@@ -12,6 +14,7 @@ import (
 type Server struct {
 	listener net.Listener
 	config   *config.Config
+	pool     *ConnectionPool
 }
 
 func NewServer(config *config.Config) (s *Server) {
@@ -42,13 +45,30 @@ func (s *Server) Listen(runner func(c *ConnectionHandler, conf *config.Config), 
 
 		wc := utils.NewWatchableReadWriter(t)
 
-		ch := ConnectionHandler{
-			config: s.config,
-			conn:   &WrappedConnection{Telnet: *t, watcher: wc},
+		id, err := utils.GetUUID()
+		if err != nil {
+			utils.HandleError(errors.New("utils.GetUUID - " + err.Error()))
+			return
 		}
 
-		ch.Handle(runner, conf)
+		ch := ConnectionHandler{
+			id:     id,
+			config: s.config,
+			conn:   &WrappedConnection{Telnet: *t, watcher: wc},
+			pool:   s.pool.messages,
+		}
+		err = s.pool.AddToPool(&ch)
+		if err != nil {
+			utils.Error("server listen() add to pool failure: " + err.Error())
+		} else {
+			ch.Handle(runner, conf)
+		}
 	}
+}
+
+func (s *Server) CreateConnectionPool() {
+	s.pool = NewConnectionPool()
+	go s.pool.Run()
 }
 
 func (s *Server) Run(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) (err error) {
@@ -58,7 +78,20 @@ func (s *Server) Run(runner func(c *ConnectionHandler, conf *config.Config), con
 		return err
 	}
 
+	log.Println("Creating Connection Pool")
+	s.CreateConnectionPool()
+
+	go s.TestBroadcastLoop()
+
 	log.Println("Listening for Connections...")
 	s.Listen(runner, conf)
 	return nil
+}
+
+func (s *Server) TestBroadcastLoop() {
+	for {
+		time.Sleep(time.Second * 5)
+		log.Println("Broadcasting Message")
+		s.pool.messages <- PoolMessage{Type: "broadcast", Args: []string{"\nThis is a test of the emergency broadcast system"}}
+	}
 }

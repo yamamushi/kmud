@@ -10,12 +10,12 @@ import (
 
 // Config struct
 type Config struct {
-	Server  serverConfig   `toml:"server"`
-	DB      databaseConfig `toml:"database"`
-	Crypt   cryptConfig    `toml:"crypt"`
-	Login   loginConfig    `toml:"login"`
-	Cluster clusterConfig  `toml:"cluster"`
-	Game    gameConfig     `toml:"game"`
+	Server   serverConfig   `toml:"server"`
+	DB       databaseConfig `toml:"database"`
+	Crypt    cryptConfig    `toml:"crypt"`
+	Frontend frontendConfig `toml:"frontend"`
+	Cluster  clusterConfig  `toml:"cluster"`
+	Game     gameConfig     `toml:"game"`
 }
 
 var configquerylocker sync.Mutex
@@ -71,9 +71,10 @@ type serverConfig struct {
 
 type cryptConfig struct {
 	AccountManagerSecret string `toml:"account_manager_secret"`
+	FrontendCommsSecret  string `toml:"frontend_comms_secret"`
 }
 
-type loginConfig struct {
+type frontendConfig struct {
 	Title string `toml:"login_menu_title"`
 }
 

@@ -20,7 +20,7 @@ func mainMenu(c *telnetserver.ConnectionHandler, conf *config.Config) {
 	// Menu is a helper set of utilities
 	// For drawing an interactive menuing system
 	utils.ExecMenu(
-		conf.Login.Title,
+		conf.Frontend.Title,
 		c,
 		func(menu *utils.Menu) {
 			menu.AddAction("l", "Login", func() {
