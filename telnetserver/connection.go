@@ -50,12 +50,12 @@ func (c *ConnectionHandler) GetWindowSize() (int, int) {
 	return 80, 80
 }
 
-func (c *ConnectionHandler) Handle(runner func(c *ConnectionHandler)) {
+func (c *ConnectionHandler) Handle(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) {
 	go func() {
 		defer c.conn.Close()
 		defer c.HandleDisconnect()
 
-		runner(c)
+		runner(c, conf)
 	}()
 }
 

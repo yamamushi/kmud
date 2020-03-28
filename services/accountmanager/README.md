@@ -52,6 +52,17 @@ Will also return account information.
         Response:
             Accounts: ([]types.Account)   
             Error: (string) Error status (empty on success)  
+    
+    /modify
+    
+        Request: Secret: (string) Secret shared token used by frontend service for Auth.
+        AuthToken: (string) User Account Auth Token
+        Account: (types.Account) Formatted account object to modify (email or username)
+            Note: You should stick to one field modification per use.
+        
+        Response:
+            Account: (types.Account) Modified Account Record   
+            Error: (string) Error status (empty on success) 
             
 ## Examples
 
@@ -97,7 +108,14 @@ Filter for all fields
     
 Output
     
-    {"account":{"username":"accountusername","email":"account@email.com","permissions":["user"],"locked":"false"}}
+    {
+    	"account": {
+    		"username": "accountusername",
+    		"email": "account@email.com",
+    		"permissions": ["user"],
+    		"locked": "false"
+    	}
+    }
     
 Filter for email
 
@@ -105,7 +123,12 @@ Filter for email
     
 Output
     
-    {"account":{"username":"accountusername","email":"account@email.com"}}
+    {
+    	"account": {
+    		"username": "accountusername",
+    		"email": "account@email.com"
+    	}
+    }
     
 Example Errors
 
@@ -148,4 +171,26 @@ Example Errors
     {"account":{},"error":"invalid token format"}
     
     
+### Modify Account
+
+    curl -XPOST -d'{"secret":"secret420","token":"yamamushi2001:gSvJnwml38wliLKmspFOh2moNEewAiMRvRgc3CW6A","account":{"username":"accountname","email":"newemail@email.com","hashedpass":"74657374"}}' localhost:4242/modify
     
+Output
+
+    {
+    	"account": {
+    		"username": "accountname",
+    		"email": "newemail@email.com",
+    		"hashedpass": "",
+    		"groups": ["default", "moderators"],
+    		"permissions": ["user"],
+    		"locked": "false",
+    		"token": ""
+    	}
+    }
+
+Example Errors
+
+    {"accounts":[],"error":"unauthorized request"}
+    
+    {"account":{},"error":"invalid token format"}    

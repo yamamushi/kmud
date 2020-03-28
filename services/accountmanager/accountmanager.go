@@ -23,18 +23,22 @@ func main() {
 
 	log.Println("Creating endpoint handlers")
 	svc := accountManagerService{}
+
+	// Auth
 	authHandler := httptransport.NewServer(
 		makeAuthEndpoint(svc, conf, db),
 		decodeAuthRequest,
 		encodeResponse,
 	)
 
+	// Account Info
 	accountInfoHandler := httptransport.NewServer(
 		makeAccountInfoEndpoint(svc, conf, db),
 		decodeAccountInfoRequest,
 		encodeResponse,
 	)
 
+	// Register Account
 	accountRegistrationHandler := httptransport.NewServer(
 		makeAccountRegistrationEndpoint(svc, conf, db),
 		decodeAccountRegistrationRequest,
@@ -48,19 +52,20 @@ func main() {
 		encodeResponse,
 	)
 
+	// Modify Account
+	modifyHandler := httptransport.NewServer(
+		makeModifyEndpoint(svc, conf, db),
+		decodeModifyRequest,
+		encodeResponse,
+	)
 	/*
-		- ModifyCharacters
-		- ModifyPermissions
-		- ToggleAccountLock
-		- ModifyEmail
-		- ModifyUsername
-		- GetAccountByFilter (filter by email, character, username)
-		- Add permissions checking for accountinfo command
+		- ModifyPermissionsGroups
 	*/
 
 	log.Println("Registering endpoint handlers")
 	http.Handle("/auth", authHandler)
 	http.Handle("/accountinfo", accountInfoHandler)
+	http.Handle("/modify", modifyHandler)
 	http.Handle("/register", accountRegistrationHandler)
 	http.Handle("/search", searchHandler)
 

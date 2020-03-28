@@ -33,7 +33,7 @@ func (s *Server) Bootstrap() {
 
 }
 
-func (s *Server) Listen(runner func(c *ConnectionHandler)) {
+func (s *Server) Listen(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) {
 	for {
 		conn, err := s.listener.Accept()
 		utils.HandleError(err)
@@ -47,11 +47,11 @@ func (s *Server) Listen(runner func(c *ConnectionHandler)) {
 			conn:   &WrappedConnection{Telnet: *t, watcher: wc},
 		}
 
-		ch.Handle(runner)
+		ch.Handle(runner, conf)
 	}
 }
 
-func (s *Server) Run(runner func(c *ConnectionHandler)) (err error) {
+func (s *Server) Run(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) (err error) {
 	log.Println("Starting Service")
 	err = s.Setup()
 	if err != nil {
@@ -59,6 +59,6 @@ func (s *Server) Run(runner func(c *ConnectionHandler)) (err error) {
 	}
 
 	log.Println("Listening for Connections...")
-	s.Listen(runner)
+	s.Listen(runner, conf)
 	return nil
 }

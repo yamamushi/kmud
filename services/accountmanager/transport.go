@@ -40,8 +40,16 @@ func makeAccountRegistrationEndpoint(svc AccountManagerService, conf *config.Con
 func makeSearchEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(searchRequest)
-		account, err := svc.Search(req.Secret, req.Token, req.Account, conf, db)
-		return searchResponse{Accounts: account, Err: err.Error()}, nil
+		accounts, err := svc.Search(req.Secret, req.Token, req.Account, conf, db)
+		return searchResponse{Accounts: accounts, Err: err.Error()}, nil
+	}
+}
+
+func makeModifyEndpoint(svc AccountManagerService, conf *config.Config, db *database.DatabaseHandler) endpoint.Endpoint {
+	return func(_ context.Context, request interface{}) (interface{}, error) {
+		req := request.(modifyRequest)
+		account, err := svc.Modify(req.Secret, req.Token, req.Account, conf, db)
+		return modifyResponse{Account: account, Err: err.Error()}, nil
 	}
 }
 
@@ -63,6 +71,14 @@ func decodeAccountInfoRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func decodeAccountRegistrationRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var request accountRegistrationRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	return request, nil
+}
+
+func decodeModifyRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request modifyRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -122,5 +138,16 @@ type searchRequest struct {
 
 type searchResponse struct {
 	Accounts []types.Account `json:"accounts"`
+	Err      string          `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
+}
+
+type modifyRequest struct {
+	Secret  string        `json:"secret"`
+	Token   string        `json:"token"`
+	Account types.Account `json:"account"`
+}
+
+type modifyResponse struct {
+	Account types.Account   `json:"account"`
 	Err      string          `json:"error,omitempty"` // errors don't JSON-marshal, so we use a string
 }

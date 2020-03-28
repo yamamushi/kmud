@@ -103,7 +103,8 @@ func ValidateRequest(secret string, token string, inputgroup string, inputpermis
 
 	result, err := DB.FindOne(bson.M{"username": tokenFields[0]}, conf.DB.MongoDB, "accounts")
 	if err != nil {
-		return types.Account{}, errors.New("unauthorized request")
+		output := BsonMapToAccount(result)
+		return output, errors.New("unauthorized request")
 	}
 
 	accountStruct := BsonMapToAccount(result)
@@ -113,7 +114,8 @@ func ValidateRequest(secret string, token string, inputgroup string, inputpermis
 
 	err = CheckAccountAccess(inputgroup, inputpermission, accountStruct)
 	if err != nil {
-		return types.Account{}, err
+		output := BsonMapToAccount(result)
+		return output, err
 	}
 
 	return accountStruct, nil

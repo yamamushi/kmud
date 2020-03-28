@@ -8,3 +8,16 @@ verbosity = log
 [database]
 
 mongohost = "localhost"
+
+[login]
+
+title = "kmud-2020"
+
+[crypt]
+
+account_manager_secret = "secret"
+
+[cluster]
+
+account_manager_hostname = "localhost:4242"
+frontend_hostname = "localhost:4200"

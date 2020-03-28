@@ -13,6 +13,8 @@ type Config struct {
 	Server serverConfig   `toml:"server"`
 	DB     databaseConfig `toml:"database"`
 	Crypt  cryptConfig    `toml:"crypt"`
+	Login  loginConfig    `toml:"login"`
+	Cluster clusterConfig `toml:"cluster"`
 }
 
 var configquerylocker sync.Mutex
@@ -68,4 +70,13 @@ type serverConfig struct {
 
 type cryptConfig struct {
 	AccountManagerSecret string `toml:"account_manager_secret"`
+}
+
+type loginConfig struct {
+	Title string `toml:"title"`
+}
+
+type clusterConfig struct {
+	AccountManagerHostname string `toml:"account_manager_hostname"`
+	FrontendHostname string `toml:"frontend_hostname"`
 }

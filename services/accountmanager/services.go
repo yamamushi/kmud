@@ -9,6 +9,7 @@ import (
 	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"log"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ type AccountManagerService interface {
 	Auth(string, string, string, *config.Config, *database.DatabaseHandler) (string, error)
 	AccountInfo(string, string, string, *config.Config, *database.DatabaseHandler) (types.Account, error)
 	AccountRegistration(string, string, string, string, *config.Config, *database.DatabaseHandler) error
+	Modify(string, string, types.Account, *config.Config, *database.DatabaseHandler) (types.Account, error)
 	Search(string, string, types.Account, *config.Config, *database.DatabaseHandler) ([]types.Account, error)
 }
 
@@ -171,4 +173,49 @@ func (accountManagerService) Search(secret string, token string, inputAccount ty
 		output = append(output, converted)
 	}
 	return output, utils.EmptyError()
+}
+
+
+func (accountManagerService) Modify(secret string, token string, inputAccount types.Account, conf *config.Config, DB *database.DatabaseHandler) (types.Account, error) {
+
+	userAccount, err := utils.ValidateRequest(secret, token, "admin", "", conf, DB)
+	if err != nil {
+		if userAccount.Username != inputAccount.Username && userAccount.Email != inputAccount.Email {
+			return types.Account{}, err
+		}
+	}
+
+	var filterAccount types.Account
+	if inputAccount.Username != "" && userAccount.Username == inputAccount.Username {
+		filterAccount = types.Account{Username: inputAccount.Username}
+	} else if inputAccount.Email != "" && userAccount.Email == inputAccount.Email {
+		filterAccount = types.Account{Email: inputAccount.Email}
+	}
+
+	filter := utils.AccountToBson(filterAccount)
+	results, err := DB.FindOne(filter, conf.DB.MongoDB, "accounts")
+	if err != nil {
+		log.Println(err)
+		return types.Account{}, errors.New("unauthorized request")
+	}
+
+	retrievedAccount := utils.BsonMapToAccount(results)
+	if inputAccount.Username != "" {
+		retrievedAccount.Username = inputAccount.Username
+	}
+	if inputAccount.Email != "" {
+		retrievedAccount.Email = inputAccount.Email
+	}
+
+	updatedAccount := utils.AccountToBson(retrievedAccount)
+
+	err = DB.UpdateOne(filter, updatedAccount, conf.DB.MongoDB, "accounts")
+	if err != nil {
+		return types.Account{}, errors.New("unauthorized request")
+	}
+
+	retrievedAccount.Token = ""
+	retrievedAccount.HashedPass = ""
+
+	return retrievedAccount, utils.EmptyError()
 }
