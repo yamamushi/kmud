@@ -31,18 +31,17 @@ func mainMenu(c *telnet.ConnectionHandler, term *telnet.Terminal, conf *config.C
 				}
 			})
 
-			menu.AddAction("n", "New user", func() {
-				_ = registerUserHandler(c.GetConn(), conf)
+			menu.AddAction("n", "Nyan", func() {
+				term.Nyan()
 			})
 
 			menu.AddAction("t", "Testing", func() {
-				term.ClearScreen()
-				term.MoveCursor(0, (term.Columns/2)-10)
-				term.LowIntensity()
-				term.Reset()
-
+				term.Refresh()
+				term.MoveCursor(0, (term.ColI/2)-10)
 			})
-
+			menu.AddAction("c", "refresh", func() {
+				term.Refresh()
+			})
 			menu.AddAction("q", "Disconnect", func() {
 				menu.Exit()
 				return

@@ -5,26 +5,30 @@ User manager is a service that keeps track of all player connection states. If a
 
 Calls that usermanager handles:
 
-    globalwho 
-    
-        Will give a global list of who is logged in.
+
         
-    disconnect
+    disconnect <session id>
     
         Handles removing a user from the logged in sessions
        
         Will also notify the character state manager.
         
-    connect 
+    connect <account> <character> <session id>
     
         Handles adding a user to the logged in sessions
         
         Will also notify the character state manager. 
         
-    accountstatus <name>
+    who <filter> 
+    
+        Will give a list of users that match the filter.
+        
+    account <account>
     
         Will check if a target user (account name) is logged in
         as well as details about the session.
         
-    
+    status <id> 
+        
+        Status of a given session ID 
     

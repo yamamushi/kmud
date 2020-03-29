@@ -1,16 +1,20 @@
 package telnet
 
 import (
+	"github.com/yamamushi/kmud-2020/toys"
 	"github.com/yamamushi/kmud-2020/utils"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Terminal struct {
 	telnet  *Telnet
 	Type    string
-	Columns int
-	Rows    int
+	Columns string
+	ColI    int
+	Rows    string
+	RowI    int
 	VT100   bool
 }
 
@@ -39,8 +43,10 @@ func ResetSettings(telnet *Telnet, t *Terminal) (*Terminal, error) {
 	//log.Println(x, y)
 	t.telnet = telnet
 	t.Type = termtype
-	t.Columns = x
-	t.Rows = y
+	t.Columns = strconv.Itoa(x)
+	t.ColI = x
+	t.Rows = strconv.Itoa(y)
+	t.RowI = y
 	t.VT100 = vt100
 	return t, nil
 }
@@ -135,5 +141,91 @@ func (t *Terminal) MoveCursor(row int, column int) {
 func (t *Terminal) ResetCursor() {
 	if t.VT100 {
 		_, _ = t.telnet.Write([]byte("\u001B8"))
+	}
+}
+
+func (t *Terminal) ClearCursorRight() {
+	if t.VT100 {
+		_, _ = t.telnet.Write([]byte("\u001B[0K"))
+	}
+}
+
+func (t *Terminal) ClearCursorLeft() {
+	if t.VT100 {
+		_, _ = t.telnet.Write([]byte("\u001B[1K"))
+	}
+}
+
+func (t *Terminal) ClearLine() {
+	if t.VT100 {
+		_, _ = t.telnet.Write([]byte("\u001B[2K"))
+	}
+}
+
+func (t *Terminal) Refresh() {
+	if t.VT100 {
+		_, _ = t.telnet.Write([]byte("\u001B8"))
+		for row := 0; row <= t.RowI; row++ {
+			_, _ = t.telnet.Write([]byte("\u001B[" + strconv.Itoa(row) + ";0H"))
+			_, _ = t.telnet.Write([]byte("\u001B[2K"))
+		}
+	}
+}
+
+func (t *Terminal) Nyan() {
+	if t.VT100 {
+		for {
+			var wait time.Duration
+			wait = 100
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan0))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan1))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan2))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan3))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan4))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan5))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan6))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan7))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan8))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan9))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan10))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+
+			_, _ = t.telnet.Write([]byte(toys.Nyan11))
+			time.Sleep(wait * time.Millisecond)
+			t.Refresh()
+		}
 	}
 }

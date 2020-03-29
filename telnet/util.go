@@ -1,6 +1,8 @@
 package telnet
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func ToString(bytes []byte) string {
 	str := ""

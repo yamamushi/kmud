@@ -1,5 +1,11 @@
 package telnet
 
+/*
+http://mud-dev.wikidot.com/telnet:negotiation
+https://users.cs.cf.ac.uk/Dave.Marshall/Internet/node141.html
+
+*/
+
 import (
 	"errors"
 	"strconv"
