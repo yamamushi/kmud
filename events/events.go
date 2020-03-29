@@ -2,9 +2,9 @@ package events
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"time"
 
-	"github.com/yamamushi/kmud-2020/database"
 	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
 )
@@ -183,8 +183,8 @@ type LockEvent struct {
 }
 
 func (e BroadcastEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorCyan, "Broadcast from "+e.Character.GetName()+": ") +
-		types.Colorize(types.ColorWhite, e.Message)
+	return color.Colorize(color.Cyan, "Broadcast from "+e.Character.GetName()+": ") +
+		color.Colorize(color.White, e.Message)
 }
 
 func (e BroadcastEvent) IsFor(receiver EventReceiver) bool {
@@ -200,8 +200,8 @@ func (e SayEvent) ToString(receiver EventReceiver) string {
 		who = e.Character.GetName() + " says"
 	}
 
-	return types.Colorize(types.ColorBlue, who+", ") +
-		types.Colorize(types.ColorWhite, "\""+e.Message+"\"")
+	return color.Colorize(color.Blue, who+", ") +
+		color.Colorize(color.White, "\""+e.Message+"\"")
 }
 
 func (e SayEvent) IsFor(receiver EventReceiver) bool {
@@ -210,7 +210,7 @@ func (e SayEvent) IsFor(receiver EventReceiver) bool {
 
 // Emote
 func (e EmoteEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorYellow, e.Character.GetName()+" "+e.Emote)
+	return color.Colorize(color.Yellow, e.Character.GetName()+" "+e.Emote)
 }
 
 func (e EmoteEvent) IsFor(receiver EventReceiver) bool {
@@ -220,11 +220,11 @@ func (e EmoteEvent) IsFor(receiver EventReceiver) bool {
 // Tell
 func (e TellEvent) ToString(receiver EventReceiver) string {
 	if receiver == e.To {
-		return types.Colorize(types.ColorMagenta,
-			fmt.Sprintf("Message from %e: %e", e.From.GetName(), types.Colorize(types.ColorWhite, e.Message)))
+		return color.Colorize(color.Magenta,
+			fmt.Sprintf("Message from %e: %e", e.From.GetName(), color.Colorize(color.White, e.Message)))
 	} else {
-		return types.Colorize(types.ColorMagenta,
-			fmt.Sprintf("Message to %e: %e", e.To.GetName(), types.Colorize(types.ColorWhite, e.Message)))
+		return color.Colorize(color.Magenta,
+			fmt.Sprintf("Message to %e: %e", e.To.GetName(), color.Colorize(color.White, e.Message)))
 	}
 }
 
@@ -234,7 +234,7 @@ func (e TellEvent) IsFor(receiver EventReceiver) bool {
 
 // Enter
 func (e EnterEvent) ToString(receiver EventReceiver) string {
-	message := fmt.Sprintf("%v%e %vhas entered the room", types.ColorBlue, e.Character.GetName(), types.ColorWhite)
+	message := fmt.Sprintf("%v%e %vhas entered the room", color.Blue, e.Character.GetName(), color.White)
 	if e.Direction != types.DirectionNone {
 		message = fmt.Sprintf("%e from the %e", message, e.Direction.ToString())
 	}
@@ -247,7 +247,7 @@ func (e EnterEvent) IsFor(receiver EventReceiver) bool {
 
 // Leave
 func (e LeaveEvent) ToString(receiver EventReceiver) string {
-	message := fmt.Sprintf("%v%e %vhas left the room", types.ColorBlue, e.Character.GetName(), types.ColorWhite)
+	message := fmt.Sprintf("%v%e %vhas left the room", color.Blue, e.Character.GetName(), color.White)
 	if e.Direction != types.DirectionNone {
 		message = fmt.Sprintf("%e to the %e", message, e.Direction.ToString())
 	}
@@ -260,7 +260,7 @@ func (e LeaveEvent) IsFor(receiver EventReceiver) bool {
 
 // RoomUpdate
 func (e RoomUpdateEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorWhite, "This room has been modified")
+	return color.Colorize(color.White, "This room has been modified")
 }
 
 func (e RoomUpdateEvent) IsFor(receiver EventReceiver) bool {
@@ -269,8 +269,8 @@ func (e RoomUpdateEvent) IsFor(receiver EventReceiver) bool {
 
 // Login
 func (e LoginEvent) ToString(receiver EventReceiver) string {
-	return types.Colorize(types.ColorBlue, e.Character.GetName()) +
-		types.Colorize(types.ColorWhite, " has connected")
+	return color.Colorize(color.Blue, e.Character.GetName()) +
+		color.Colorize(color.White, " has connected")
 }
 
 func (e LoginEvent) IsFor(receiver EventReceiver) bool {
@@ -289,9 +289,9 @@ func (e LogoutEvent) IsFor(receiver EventReceiver) bool {
 // CombatStart
 func (e CombatStartEvent) ToString(receiver EventReceiver) string {
 	if receiver == e.Attacker {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("You are attacking %e!", e.Defender.GetName()))
+		return color.Colorize(color.Red, fmt.Sprintf("You are attacking %e!", e.Defender.GetName()))
 	} else if receiver == e.Defender {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("%e is attacking you!", e.Attacker.GetName()))
+		return color.Colorize(color.Red, fmt.Sprintf("%e is attacking you!", e.Attacker.GetName()))
 	}
 
 	return ""
@@ -304,9 +304,9 @@ func (e CombatStartEvent) IsFor(receiver EventReceiver) bool {
 // CombatStop
 func (e CombatStopEvent) ToString(receiver EventReceiver) string {
 	if receiver == e.Attacker {
-		return types.Colorize(types.ColorGreen, fmt.Sprintf("You stopped attacking %e", e.Defender.GetName()))
+		return color.Colorize(color.Green, fmt.Sprintf("You stopped attacking %e", e.Defender.GetName()))
 	} else if receiver == e.Defender {
-		return types.Colorize(types.ColorGreen, fmt.Sprintf("%e has stopped attacking you", e.Attacker.GetName()))
+		return color.Colorize(color.Green, fmt.Sprintf("%e has stopped attacking you", e.Attacker.GetName()))
 	}
 
 	return ""
@@ -324,9 +324,9 @@ func (e CombatEvent) ToString(receiver EventReceiver) string {
 	}
 
 	if receiver == e.Attacker {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("You hit %e%e for %v damage", e.Defender.GetName(), skillMsg, e.Power))
+		return color.Colorize(color.Red, fmt.Sprintf("You hit %e%e for %v damage", e.Defender.GetName(), skillMsg, e.Power))
 	} else if receiver == e.Defender {
-		return types.Colorize(types.ColorRed, fmt.Sprintf("%e hits you%e for %v damage", e.Attacker.GetName(), skillMsg, e.Power))
+		return color.Colorize(color.Red, fmt.Sprintf("%e hits you%e for %v damage", e.Attacker.GetName(), skillMsg, e.Power))
 	}
 
 	return ""
@@ -371,10 +371,10 @@ func (e DeathEvent) IsFor(receiver EventReceiver) bool {
 
 func (e DeathEvent) ToString(receiver EventReceiver) string {
 	if receiver == e.Character {
-		return types.Colorize(types.ColorRed, ">> You have died")
+		return color.Colorize(color.Red, ">> You have died")
 	}
 
-	return types.Colorize(types.ColorRed, fmt.Sprintf(">> %e has died", e.Character.GetName()))
+	return color.Colorize(color.Red, fmt.Sprintf(">> %e has died", e.Character.GetName()))
 }
 
 // Lock
@@ -388,7 +388,7 @@ func (e LockEvent) ToString(receiver EventReceiver) string {
 		status = "locked"
 	}
 
-	return types.Colorize(types.ColorBlue,
+	return color.Colorize(color.Blue,
 		fmt.Sprintf("The exit to the %e has been %e", e.Exit.ToString(),
-			types.Colorize(types.ColorWhite, status)))
+			color.Colorize(color.White, status)))
 }

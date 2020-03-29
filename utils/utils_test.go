@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"github.com/yamamushi/kmud-2020/color"
 	"io"
 	"math/rand"
 	"reflect"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/yamamushi/kmud-2020/testutils"
-	"github.com/yamamushi/kmud-2020/types"
 )
 
 func Test_WriteLine(t *testing.T) {
@@ -18,7 +18,7 @@ func Test_WriteLine(t *testing.T) {
 	line := "This is a line"
 	want := line + "\r\n"
 
-	WriteLine(writer, line, types.ColorModeNone)
+	WriteLine(writer, line, color.ModeNone)
 
 	if writer.Wrote != want {
 		t.Errorf("WriteLine(%q) == %q, want %q", line, writer.Wrote, want)
@@ -61,7 +61,7 @@ func Test_GetRawUserInput(t *testing.T) {
 
 	for _, test := range tests {
 		readWriter.ToRead = test.input
-		line := GetRawUserInput(readWriter, ">", types.ColorModeNone)
+		line := GetRawUserInput(readWriter, ">", color.ModeNone)
 		if line != test.output {
 			t.Errorf("GetRawUserInput(%q) == %q, want %q", test.input, line, test.output)
 		}
@@ -85,7 +85,7 @@ func Test_GetUserInput(t *testing.T) {
 
 	for _, test := range tests {
 		readWriter.ToRead = test.input
-		line := GetUserInput(readWriter, ">", types.ColorModeNone)
+		line := GetUserInput(readWriter, ">", color.ModeNone)
 		if line != test.output {
 			t.Errorf("GetUserInput(%q) == %q, want %q", test.input, line, test.output)
 		}
@@ -103,7 +103,7 @@ func Test_GetUserInputPanicOnEOF(t *testing.T) {
 		}
 	}()
 
-	GetUserInput(readWriter, "", types.ColorModeNone)
+	GetUserInput(readWriter, "", color.ModeNone)
 }
 
 func Test_HandleError(t *testing.T) {

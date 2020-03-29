@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"math"
 	"sort"
 	"strings"
@@ -200,10 +201,10 @@ func init() {
 			exec: func(c *command, s *Session, arg string) {
 				subcommand, arg := utils.Argify(arg)
 				if subcommand == "" {
-					s.WriteLine("Current zone: " + types.Colorize(types.ColorBlue, s.currentZone().GetName()))
+					s.WriteLine("Current zone: " + color.Colorize(color.Blue, s.currentZone().GetName()))
 				} else if subcommand == "list" {
-					s.WriteLineColor(types.ColorBlue, "Zones")
-					s.WriteLineColor(types.ColorBlue, "-----")
+					s.WriteLineColor(color.Blue, "Zones")
+					s.WriteLineColor(color.Blue, "-----")
 					for _, zone := range model.GetZones() {
 						s.WriteLine(zone.GetName())
 					}
@@ -347,22 +348,22 @@ func init() {
 		"colors": {
 			admin: false,
 			exec: func(c *command, s *Session, arg string) {
-				s.WriteLineColor(types.ColorNormal, "Normal")
-				s.WriteLineColor(types.ColorRed, "Red")
-				s.WriteLineColor(types.ColorDarkRed, "Dark Red")
-				s.WriteLineColor(types.ColorGreen, "Green")
-				s.WriteLineColor(types.ColorDarkGreen, "Dark Green")
-				s.WriteLineColor(types.ColorBlue, "Blue")
-				s.WriteLineColor(types.ColorDarkBlue, "Dark Blue")
-				s.WriteLineColor(types.ColorYellow, "Yellow")
-				s.WriteLineColor(types.ColorDarkYellow, "Dark Yellow")
-				s.WriteLineColor(types.ColorMagenta, "Magenta")
-				s.WriteLineColor(types.ColorDarkMagenta, "Dark Magenta")
-				s.WriteLineColor(types.ColorCyan, "Cyan")
-				s.WriteLineColor(types.ColorDarkCyan, "Dark Cyan")
-				s.WriteLineColor(types.ColorBlack, "Black")
-				s.WriteLineColor(types.ColorWhite, "White")
-				s.WriteLineColor(types.ColorGray, "Gray")
+				s.WriteLineColor(color.Normal, "Normal")
+				s.WriteLineColor(color.Red, "Red")
+				s.WriteLineColor(color.DarkRed, "Dark Red")
+				s.WriteLineColor(color.Green, "Green")
+				s.WriteLineColor(color.DarkGreen, "Dark Green")
+				s.WriteLineColor(color.Blue, "Blue")
+				s.WriteLineColor(color.DarkBlue, "Dark Blue")
+				s.WriteLineColor(color.Yellow, "Yellow")
+				s.WriteLineColor(color.DarkYellow, "Dark Yellow")
+				s.WriteLineColor(color.Magenta, "Magenta")
+				s.WriteLineColor(color.DarkMagenta, "Dark Magenta")
+				s.WriteLineColor(color.Cyan, "Cyan")
+				s.WriteLineColor(color.DarkCyan, "Dark Cyan")
+				s.WriteLineColor(color.Black, "Black")
+				s.WriteLineColor(color.White, "White")
+				s.WriteLineColor(color.Gray, "Gray")
 			},
 		},
 		"cm": cAlias("colormode"),
@@ -372,24 +373,24 @@ func init() {
 				if arg == "" {
 					message := "Current color mode is: "
 					switch s.user.GetColorMode() {
-					case types.ColorModeNone:
+					case color.ModeNone:
 						message = message + "None"
-					case types.ColorModeLight:
+					case color.ModeLight:
 						message = message + "Light"
-					case types.ColorModeDark:
+					case color.ModeDark:
 						message = message + "Dark"
 					}
 					s.WriteLine(message)
 				} else {
 					switch strings.ToLower(arg) {
 					case "none":
-						s.user.SetColorMode(types.ColorModeNone)
+						s.user.SetColorMode(color.ModeNone)
 						s.WriteLine("Color mode set to: None")
 					case "light":
-						s.user.SetColorMode(types.ColorModeLight)
+						s.user.SetColorMode(color.ModeLight)
 						s.WriteLine("Color mode set to: Light")
 					case "dark":
-						s.user.SetColorMode(types.ColorModeDark)
+						s.user.SetColorMode(color.ModeDark)
 						s.WriteLine("Color mode set to: Dark")
 					default:
 						s.WriteLine("Valid color modes are: None, Light, Dark")
@@ -1088,7 +1089,7 @@ func toggleExitMenu(s *Session) {
 		if s.GetRoom().HasExit(direction) {
 			text = "On"
 		}
-		return types.Colorize(types.ColorBlue, text)
+		return color.Colorize(color.Blue, text)
 	}
 
 	toggleExit := func(direction types.Direction, menu *utils.Menu) func() {

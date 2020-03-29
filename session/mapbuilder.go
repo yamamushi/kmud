@@ -1,6 +1,7 @@
 package session
 
 import (
+	color2 "github.com/yamamushi/kmud-2020/color"
 	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
 )
@@ -15,7 +16,7 @@ type mapBuilder struct {
 
 type mapTile struct {
 	char  rune
-	color types.Color
+	color color2.Color
 }
 
 func (t *mapTile) toString() string {
@@ -23,7 +24,7 @@ func (t *mapTile) toString() string {
 		return string(t.char)
 	}
 
-	return types.Colorize(t.color, string(t.char))
+	return color2.Colorize(t.color, string(t.char))
 }
 
 func newMapBuilder(width int, height int, depth int) mapBuilder {
@@ -77,9 +78,9 @@ func (b *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 
 	if b.userRoom.GetId() == room.GetId() {
 		b.data[z][y][x].char = '*'
-		b.data[z][y][x].color = types.ColorRed
+		b.data[z][y][x].color = color2.Red
 	} else {
-		b.data[z][y][x].color = types.ColorMagenta
+		b.data[z][y][x].color = color2.Magenta
 		if room.HasExit(types.DirectionUp) && room.HasExit(types.DirectionDown) {
 			b.data[z][y][x].char = '+'
 		} else if room.HasExit(types.DirectionUp) {
@@ -97,7 +98,7 @@ func (b *mapBuilder) addRoom(room types.Room, x int, y int, z int) {
 			*/
 
 			b.data[z][y][x].char = char
-			b.data[z][y][x].color = types.ColorWhite
+			b.data[z][y][x].color = color2.White
 		}
 	}
 
@@ -128,7 +129,7 @@ func (b *mapBuilder) toString() string {
 		rows = utils.TrimLowerRows(rows)
 
 		if b.depth > 1 {
-			divider := types.Colorize(types.ColorWhite, "================================================================================\r\n")
+			divider := color2.Colorize(color2.White, "================================================================================\r\n")
 			rows = append(rows, divider)
 		}
 
@@ -149,7 +150,7 @@ func (t *mapTile) addExit(dir types.Direction) {
 		}
 	}
 
-	t.color = types.ColorBlue
+	t.color = color2.Blue
 
 	switch dir {
 	case types.DirectionNorth:

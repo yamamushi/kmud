@@ -6,6 +6,7 @@ import (
 	"compress/zlib"
 	"errors"
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"io"
 	"log"
 	"math/rand"
@@ -37,12 +38,12 @@ func SimplePrompter(prompt string) Prompter {
 	return &prompter
 }
 
-func Write(conn io.Writer, text string, cm types.ColorMode) error {
-	_, err := conn.Write([]byte(types.ProcessColors(text, cm)))
+func Write(conn io.Writer, text string, cm color.ColorMode) error {
+	_, err := conn.Write([]byte(color.ProcessColors(text, cm)))
 	return err
 }
 
-func WriteLine(conn io.Writer, line string, cm types.ColorMode) error {
+func WriteLine(conn io.Writer, line string, cm color.ColorMode) error {
 	return Write(conn, line+"\r\n", cm)
 }
 
@@ -50,7 +51,7 @@ func WriteLine(conn io.Writer, line string, cm types.ColorMode) error {
 // return to move the cursor back to the beginning of the line
 func ClearLine(conn io.Writer) error {
 	clearline := "\x1B[2K"
-	return Write(conn, clearline+"\r", types.ColorModeNone)
+	return Write(conn, clearline+"\r", color.ModeNone)
 }
 
 func Simplify(str string) string {
@@ -59,11 +60,11 @@ func Simplify(str string) string {
 	return simpleStr
 }
 
-func GetRawUserInputSuffix(conn io.ReadWriter, prompt string, suffix string, cm types.ColorMode) string {
+func GetRawUserInputSuffix(conn io.ReadWriter, prompt string, suffix string, cm color.ColorMode) string {
 	return GetRawUserInputSuffixP(conn, SimplePrompter(prompt), suffix, cm)
 }
 
-func GetRawUserInputSuffixP(conn io.ReadWriter, prompter Prompter, suffix string, cm types.ColorMode) string {
+func GetRawUserInputSuffixP(conn io.ReadWriter, prompter Prompter, suffix string, cm color.ColorMode) string {
 	scanner := bufio.NewScanner(conn)
 
 	for {
@@ -89,24 +90,27 @@ func GetRawUserInputSuffixP(conn io.ReadWriter, prompter Prompter, suffix string
 	}
 }
 
-func GetRawUserInputP(conn io.ReadWriter, prompter Prompter, cm types.ColorMode) string {
+func GetRawUserInputP(conn io.ReadWriter, prompter Prompter, cm color.ColorMode) string {
 	return GetRawUserInputSuffixP(conn, prompter, "", cm)
 }
 
-func GetRawUserInput(conn io.ReadWriter, prompt string, cm types.ColorMode) string {
+func GetRawUserInput(conn io.ReadWriter, prompt string, cm color.ColorMode) string {
 	return GetRawUserInputP(conn, SimplePrompter(prompt), cm)
 }
 
-func GetUserInputP(conn io.ReadWriter, prompter Prompter, cm types.ColorMode) string {
+func GetUserInputP(conn io.ReadWriter, prompter Prompter, cm color.ColorMode) string {
 	input := GetRawUserInputP(conn, prompter, cm)
 	return Simplify(input)
 }
 
-func GetUserInput(conn io.ReadWriter, prompt string, cm types.ColorMode) string {
+func GetUserInput(conn io.ReadWriter, prompt string, cm color.ColorMode) string {
 	input := GetUserInputP(conn, SimplePrompter(prompt), cm)
 	return Simplify(input)
 }
 
+func Log(msg string) {
+	log.Println("Log: ")
+}
 func Error(err string) {
 	HandleError(errors.New(err))
 }
@@ -336,16 +340,16 @@ func Random(low, high int) int {
 }
 
 func DirectionToExitString(direction types.Direction) string {
-	letterColor := types.ColorBlue
-	bracketColor := types.ColorDarkBlue
-	textColor := types.ColorWhite
+	letterColor := color.Blue
+	bracketColor := color.DarkBlue
+	textColor := color.White
 
 	colorize := func(letters string, text string) string {
 		return fmt.Sprintf("%s%s%s%s",
-			types.Colorize(bracketColor, "["),
-			types.Colorize(letterColor, letters),
-			types.Colorize(bracketColor, "]"),
-			types.Colorize(textColor, text))
+			color.Colorize(bracketColor, "["),
+			color.Colorize(letterColor, letters),
+			color.Colorize(bracketColor, "]"),
+			color.Colorize(textColor, text))
 	}
 
 	switch direction {
@@ -370,7 +374,7 @@ func DirectionToExitString(direction types.Direction) string {
 	case types.DirectionDown:
 		return colorize("D", "own")
 	case types.DirectionNone:
-		return types.Colorize(types.ColorWhite, "None")
+		return color.Colorize(color.White, "None")
 	}
 
 	panic("Unexpected code path")
@@ -378,7 +382,7 @@ func DirectionToExitString(direction types.Direction) string {
 
 func Paginate(list []string, width, height int) []string {
 	itemLength := func(item string) int {
-		return len(types.StripColors(item))
+		return len(color.StripColors(item))
 	}
 
 	columns := [][]string{}
@@ -513,7 +517,7 @@ func Filter(list []string, pattern string) []string {
 }
 
 func FilterItem(item, pattern string) bool {
-	return strings.Contains(strings.ToLower(types.StripColors(item)), strings.ToLower(pattern))
+	return strings.Contains(strings.ToLower(color.StripColors(item)), strings.ToLower(pattern))
 }
 
 func RemoveLast(input string, check string) string {

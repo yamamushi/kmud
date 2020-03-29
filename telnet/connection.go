@@ -1,15 +1,14 @@
-package telnetserver
+package telnet
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"io"
 	"log"
 	"runtime/debug"
 	"strings"
 
 	"github.com/yamamushi/kmud-2020/config"
-	"github.com/yamamushi/kmud-2020/telnet"
-	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
 )
 
@@ -22,8 +21,18 @@ type ConnectionHandler struct {
 }
 
 type WrappedConnection struct {
-	telnet.Telnet
+	Telnet
 	watcher *utils.WatchableReadWriter
+}
+
+// Write a raw byte to the connection rather than through the io.Writer (the wc.watcher writer)
+func (wc *WrappedConnection) RawWrite(p []byte) (int, error) {
+	return wc.Telnet.Write(p)
+}
+
+// Raw Read byte to the connection rather than through the io.Reader (the wc.watcher reader)
+func (wc *WrappedConnection) RawRead(p []byte) (int, error) {
+	return wc.Telnet.Read(p)
 }
 
 func (wc *WrappedConnection) Write(p []byte) (int, error) {
@@ -35,15 +44,15 @@ func (wc *WrappedConnection) Read(p []byte) (int, error) {
 }
 
 func (c *ConnectionHandler) WriteLine(line string, a ...interface{}) {
-	utils.WriteLine(c.conn, fmt.Sprintf(line, a...), types.ColorModeNone)
+	utils.WriteLine(c.conn, fmt.Sprintf(line, a...), color.ModeNone)
 }
 
 func (c *ConnectionHandler) Write(text string) {
-	utils.Write(c.conn, text, types.ColorModeNone)
+	utils.Write(c.conn, text, color.ModeNone)
 }
 
 func (c *ConnectionHandler) GetInput(prompt string) string {
-	return utils.GetUserInput(c.conn, prompt, types.ColorModeNone)
+	return utils.GetUserInput(c.conn, prompt, color.ModeNone)
 }
 
 func (c *ConnectionHandler) GetWindowSize() (int, int) {
@@ -51,12 +60,12 @@ func (c *ConnectionHandler) GetWindowSize() (int, int) {
 	return 80, 80
 }
 
-func (c *ConnectionHandler) Handle(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) {
+func (c *ConnectionHandler) Handle(runner func(c *ConnectionHandler, term *Terminal, conf *config.Config), term *Terminal, conf *config.Config) {
 	go func() {
 		defer c.conn.Close()
 		defer c.HandleDisconnect()
 
-		runner(c, conf)
+		runner(c, term, conf)
 	}()
 }
 

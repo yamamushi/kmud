@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"strings"
 
 	"github.com/yamamushi/kmud-2020/combat"
@@ -135,7 +136,7 @@ var actions = map[string]action{
 				}
 
 				if target != nil {
-					s.WriteLineColor(types.ColorRed, "Casting %s on %s", skill.GetName(), target.GetName())
+					s.WriteLineColor(color.Red, "Casting %s on %s", skill.GetName(), target.GetName())
 					combat.StartFight(s.pc, skill, target)
 				}
 			}
@@ -343,7 +344,7 @@ var actions = map[string]action{
 								menu.AddActionI(i, item.GetName(), func() {
 									confirmed := s.getConfirmation(fmt.Sprintf("Buy %s for %v? ", item.GetName(), item.GetValue()))
 									if confirmed && sellItem(s, store, s.pc, item) {
-										s.WriteLineColor(types.ColorGreen, "Bought %s", item.GetName())
+										s.WriteLineColor(color.Green, "Bought %s", item.GetName())
 									}
 									if len(model.ItemsIn(store.GetId())) == 0 {
 										menu.Exit()
@@ -364,7 +365,7 @@ var actions = map[string]action{
 								menu.AddActionI(i, item.GetName(), func() {
 									confirmed := s.getConfirmation(fmt.Sprintf("Sell %s for %v? ", item.GetName(), item.GetValue()))
 									if confirmed && sellItem(s, s.pc, store, item) {
-										s.WriteLineColor(types.ColorGreen, "Sold %s", item.GetName())
+										s.WriteLineColor(color.Green, "Sold %s", item.GetName())
 									}
 									if len(model.ItemsIn(s.pc.GetId())) == 0 {
 										menu.Exit()

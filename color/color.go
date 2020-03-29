@@ -1,4 +1,4 @@
-package types
+package color
 
 import (
 	"fmt"
@@ -11,32 +11,32 @@ var ColorRegex = regexp.MustCompile("([@#][0-6]|@@|##)")
 type ColorMode int
 
 const (
-	ColorModeLight ColorMode = iota
-	ColorModeDark  ColorMode = iota
-	ColorModeNone  ColorMode = iota
+	ModeLight ColorMode = iota
+	ModeDark  ColorMode = iota
+	ModeNone  ColorMode = iota
 )
 
 type Color string
 
 const (
-	ColorRed     Color = "@0"
-	ColorGreen   Color = "@1"
-	ColorYellow  Color = "@2"
-	ColorBlue    Color = "@3"
-	ColorMagenta Color = "@4"
-	ColorCyan    Color = "@5"
-	ColorWhite   Color = "@6"
+	Red     Color = "@0"
+	Green   Color = "@1"
+	Yellow  Color = "@2"
+	Blue    Color = "@3"
+	Magenta Color = "@4"
+	Cyan    Color = "@5"
+	White   Color = "@6"
 
-	ColorDarkRed     Color = "#0"
-	ColorDarkGreen   Color = "#1"
-	ColorDarkYellow  Color = "#2"
-	ColorDarkBlue    Color = "#3"
-	ColorDarkMagenta Color = "#4"
-	ColorDarkCyan    Color = "#5"
-	ColorBlack       Color = "#6"
+	DarkRed     Color = "#0"
+	DarkGreen   Color = "#1"
+	DarkYellow  Color = "#2"
+	DarkBlue    Color = "#3"
+	DarkMagenta Color = "#4"
+	DarkCyan    Color = "#5"
+	Black       Color = "#6"
 
-	ColorGray   Color = "@@"
-	ColorNormal Color = "##"
+	Gray   Color = "@@"
+	Normal Color = "##"
 )
 
 type colorCode string
@@ -63,47 +63,47 @@ const (
 )
 
 func getAnsiCode(mode ColorMode, color Color) string {
-	if mode == ColorModeNone {
+	if mode == ModeNone {
 		return ""
 	}
 
 	var code colorCode
 	switch color {
-	case ColorNormal:
+	case Normal:
 		code = normal
-	case ColorRed:
+	case Red:
 		code = red
-	case ColorGreen:
+	case Green:
 		code = green
-	case ColorYellow:
+	case Yellow:
 		code = yellow
-	case ColorBlue:
+	case Blue:
 		code = blue
-	case ColorMagenta:
+	case Magenta:
 		code = magenta
-	case ColorCyan:
+	case Cyan:
 		code = cyan
-	case ColorWhite:
+	case White:
 		code = white
-	case ColorDarkRed:
+	case DarkRed:
 		code = darkRed
-	case ColorDarkGreen:
+	case DarkGreen:
 		code = darkGreen
-	case ColorDarkYellow:
+	case DarkYellow:
 		code = darkYellow
-	case ColorDarkBlue:
+	case DarkBlue:
 		code = darkBlue
-	case ColorDarkMagenta:
+	case DarkMagenta:
 		code = darkMagenta
-	case ColorDarkCyan:
+	case DarkCyan:
 		code = darkCyan
-	case ColorBlack:
+	case Black:
 		code = black
-	case ColorGray:
+	case Gray:
 		code = gray
 	}
 
-	if mode == ColorModeDark {
+	if mode == ModeDark {
 		if code == white {
 			return string(black)
 		} else if code == black {
@@ -120,26 +120,26 @@ func getAnsiCode(mode ColorMode, color Color) string {
 
 // Wraps the given text in the given color, followed by a color reset
 func Colorize(color Color, text string) string {
-	return fmt.Sprintf("%s%s%s", string(color), text, string(ColorNormal))
+	return fmt.Sprintf("%s%s%s", string(color), text, string(Normal))
 }
 
 var Lookup = map[Color]bool{
-	ColorRed:         true,
-	ColorGreen:       true,
-	ColorYellow:      true,
-	ColorBlue:        true,
-	ColorMagenta:     true,
-	ColorCyan:        true,
-	ColorWhite:       true,
-	ColorDarkRed:     true,
-	ColorDarkGreen:   true,
-	ColorDarkYellow:  true,
-	ColorDarkBlue:    true,
-	ColorDarkMagenta: true,
-	ColorDarkCyan:    true,
-	ColorBlack:       true,
-	ColorGray:        true,
-	ColorNormal:      true,
+	Red:         true,
+	Green:       true,
+	Yellow:      true,
+	Blue:        true,
+	Magenta:     true,
+	Cyan:        true,
+	White:       true,
+	DarkRed:     true,
+	DarkGreen:   true,
+	DarkYellow:  true,
+	DarkBlue:    true,
+	DarkMagenta: true,
+	DarkCyan:    true,
+	Black:       true,
+	Gray:        true,
+	Normal:      true,
 }
 
 // Strips MUD color codes and replaces them with ansi color codes

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/yamamushi/kmud-2020/color"
 	"net"
 
 	"github.com/yamamushi/kmud-2020/utils/naturalsort"
@@ -181,8 +182,8 @@ type User interface {
 	SetWindowSize(int, int)
 	SetTerminalType(string)
 	GetTerminalType() string
-	GetColorMode() ColorMode
-	SetColorMode(ColorMode)
+	GetColorMode() color.ColorMode
+	SetColorMode(color.ColorMode)
 	IsAdmin() bool
 	SetAdmin(bool)
 }

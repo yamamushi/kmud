@@ -3,7 +3,7 @@ package main
 // Default necessary imports from kmud-2020 libraries
 import (
 	"github.com/yamamushi/kmud-2020/config"
-	"github.com/yamamushi/kmud-2020/telnetserver"
+	"github.com/yamamushi/kmud-2020/telnet"
 	"github.com/yamamushi/kmud-2020/utils"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// Here we create our server object using the provided configuration file.
-	s := telnetserver.NewServer(conf)
+	s := telnet.NewServer(conf)
 
 	// We execute the server using a func(c *telnetserver.ConnectionHandler) function
 	// The provided function will run in a goroutine and is expected to handle

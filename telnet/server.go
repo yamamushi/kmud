@@ -1,4 +1,4 @@
-package telnetserver
+package telnet
 
 import (
 	"errors"
@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/yamamushi/kmud-2020/config"
-	"github.com/yamamushi/kmud-2020/telnet"
 	"github.com/yamamushi/kmud-2020/utils"
 )
 
@@ -36,18 +35,19 @@ func (s *Server) Bootstrap() {
 
 }
 
-func (s *Server) Listen(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) {
+func (s *Server) Listen(runner func(c *ConnectionHandler, term *Terminal, conf *config.Config), conf *config.Config) {
 	for {
 		conn, err := s.listener.Accept()
 		utils.HandleError(err)
 		log.Println("Client connected:", conn.RemoteAddr())
-		t := telnet.NewTelnet(conn)
+		t := NewTelnet(conn)
 
 		wc := utils.NewWatchableReadWriter(t)
 
 		id, err := utils.GetUUID()
 		if err != nil {
 			utils.HandleError(errors.New("utils.GetUUID - " + err.Error()))
+			_ = conn.Close()
 			return
 		}
 
@@ -60,8 +60,17 @@ func (s *Server) Listen(runner func(c *ConnectionHandler, conf *config.Config), 
 		err = s.pool.AddToPool(&ch)
 		if err != nil {
 			utils.Error("server listen() add to pool failure: " + err.Error())
+			_ = conn.Close()
+			return
 		} else {
-			ch.Handle(runner, conf)
+			term, err := GetTermInfo(t)
+			if err != nil {
+				utils.Error("could not get terminal iac response: " + err.Error())
+				_ = conn.Close()
+				return
+			}
+
+			ch.Handle(runner, term, conf)
 		}
 	}
 }
@@ -71,7 +80,7 @@ func (s *Server) CreateConnectionPool() {
 	go s.pool.Run()
 }
 
-func (s *Server) Run(runner func(c *ConnectionHandler, conf *config.Config), conf *config.Config) (err error) {
+func (s *Server) Run(runner func(c *ConnectionHandler, term *Terminal, conf *config.Config), conf *config.Config) (err error) {
 	log.Println("Starting Service")
 	err = s.Setup()
 	if err != nil {

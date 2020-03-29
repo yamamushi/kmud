@@ -1,8 +1,8 @@
-package telnetserver
+package telnet
 
 import (
 	"errors"
-	"github.com/yamamushi/kmud-2020/types"
+	"github.com/yamamushi/kmud-2020/color"
 	"github.com/yamamushi/kmud-2020/utils"
 	"log"
 	"strings"
@@ -99,10 +99,10 @@ func (p *ConnectionPool) ParseMessage(message PoolMessage) {
 			if len(p.pool) > 0 {
 				for _, conn := range p.pool {
 					if conn != nil {
-						err := utils.WriteLine(conn.conn, message.Args[0], types.ColorModeNone)
+						err := utils.WriteLine(conn.conn, message.Args[0], color.ModeNone)
 						//conn.conn.Telnet.Write([]byte("\033[H\033[2J"))
 						p.HandlePoolError(conn, err)
-						err = utils.Write(conn.conn, "> ", types.ColorModeNone)
+						err = utils.Write(conn.conn, "> ", color.ModeNone)
 						p.HandlePoolError(conn, err)
 					}
 				}

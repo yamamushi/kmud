@@ -3,11 +3,11 @@ package olddatabase
 import (
 	"crypto/sha1"
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"io"
 	"net"
 	"reflect"
 
-	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
 )
 
@@ -15,7 +15,7 @@ type User struct {
 	DbObject `bson:",inline"`
 
 	Name      string
-	ColorMode types.ColorMode
+	ColorMode color.ColorMode
 	Password  []byte
 	Admin     bool
 
@@ -30,7 +30,7 @@ func NewUser(name string, password string, admin bool) *User {
 	user := &User{
 		Name:         utils.FormatName(name),
 		Password:     hash(password),
-		ColorMode:    types.ColorModeNone,
+		ColorMode:    color.ModeNone,
 		Admin:        admin,
 		online:       false,
 		windowWidth:  80,
@@ -66,13 +66,13 @@ func (u *User) IsOnline() bool {
 	return u.online
 }
 
-func (u *User) SetColorMode(cm types.ColorMode) {
+func (u *User) SetColorMode(cm color.ColorMode) {
 	u.writeLock(func() {
 		u.ColorMode = cm
 	})
 }
 
-func (u *User) GetColorMode() types.ColorMode {
+func (u *User) GetColorMode() color.ColorMode {
 	u.ReadLock()
 	defer u.ReadUnlock()
 	return u.ColorMode

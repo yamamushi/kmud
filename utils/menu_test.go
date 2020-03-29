@@ -2,10 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"testing"
 
 	"github.com/yamamushi/kmud-2020/testutils"
-	"github.com/yamamushi/kmud-2020/types"
 )
 
 func Test_Menu(t *testing.T) {
@@ -60,5 +60,5 @@ func Test_Search(t *testing.T) {
 	menu2.Print(&comm2, 0, filter)
 
 	testutils.Assert(comm1.Wrote == comm2.Wrote, t, fmt.Sprintf("Failed to correctly filter menu, got: \n%s, expected: \n%s",
-		types.StripColors(comm2.Wrote), types.StripColors(comm1.Wrote)))
+		color.StripColors(comm2.Wrote), color.StripColors(comm1.Wrote)))
 }

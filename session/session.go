@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"io"
 	"sort"
 	"strconv"
@@ -131,15 +132,15 @@ func (s *Session) Exec() {
 }
 
 func (s *Session) WriteLinef(line string, a ...interface{}) {
-	s.WriteLineColor(types.ColorWhite, line, a...)
+	s.WriteLineColor(color.White, line, a...)
 }
 
 func (s *Session) WriteLine(line string, a ...interface{}) {
-	s.WriteLineColor(types.ColorWhite, line, a...)
+	s.WriteLineColor(color.White, line, a...)
 }
 
-func (s *Session) WriteLineColor(color types.Color, line string, a ...interface{}) {
-	s.printLine(types.Colorize(color, fmt.Sprintf(line, a...)))
+func (s *Session) WriteLineColor(color color.Color, line string, a ...interface{}) {
+	s.printLine(color.Colorize(color, fmt.Sprintf(line, a...)))
 }
 
 func (s *Session) printLine(line string, a ...interface{}) {
@@ -151,7 +152,7 @@ func (s *Session) Write(text string) {
 }
 
 func (s *Session) printError(err string, a ...interface{}) {
-	s.WriteLineColor(types.ColorRed, err, a...)
+	s.WriteLineColor(color.Red, err, a...)
 }
 
 func (s *Session) clearLine() {
@@ -228,7 +229,7 @@ func (s *Session) getRawUserInput(prompt string) string {
 }
 
 func (s *Session) getConfirmation(prompt string) bool {
-	answer := s.getCleanUserInput(types.Colorize(types.ColorWhite, prompt))
+	answer := s.getCleanUserInput(color.Colorize(color.White, prompt))
 	return answer == "y" || answer == "yes"
 }
 
@@ -266,7 +267,7 @@ func (s *Session) GetPrompt() string {
 		prompt = fmt.Sprintf("%s %s", states, prompt)
 	}
 
-	return types.Colorize(types.ColorWhite, prompt)
+	return color.Colorize(color.White, prompt)
 }
 
 func (s *Session) currentZone() types.Zone {
@@ -360,39 +361,39 @@ func (s *Session) printRoom(room types.Room) {
 	}
 
 	str = fmt.Sprintf("\r\n %v>>> %v%s%s %v<<< %v(%v %v %v)\r\n\r\n %v%s\r\n\r\n",
-		types.ColorWhite, types.ColorBlue,
+		color.White, color.Blue,
 		areaStr, room.GetTitle(),
-		types.ColorWhite, types.ColorBlue,
+		color.White, color.Blue,
 		room.GetLocation().X, room.GetLocation().Y, room.GetLocation().Z,
-		types.ColorWhite,
+		color.White,
 		room.GetDescription())
 
 	if store != nil {
-		str = fmt.Sprintf("%s Store: %s\r\n\r\n", str, types.Colorize(types.ColorBlue, store.GetName()))
+		str = fmt.Sprintf("%s Store: %s\r\n\r\n", str, color.Colorize(color.Blue, store.GetName()))
 	}
 
 	extraNewLine := ""
 
 	if len(pcs) > 0 {
-		str = fmt.Sprintf("%s %sAlso here:", str, types.ColorBlue)
+		str = fmt.Sprintf("%s %sAlso here:", str, color.Blue)
 
 		names := make([]string, len(pcs))
 		for i, char := range pcs {
-			names[i] = types.Colorize(types.ColorWhite, char.GetName())
+			names[i] = color.Colorize(color.White, char.GetName())
 		}
-		str = fmt.Sprintf("%s %s \r\n", str, strings.Join(names, types.Colorize(types.ColorBlue, ", ")))
+		str = fmt.Sprintf("%s %s \r\n", str, strings.Join(names, color.Colorize(color.Blue, ", ")))
 
 		extraNewLine = "\r\n"
 	}
 
 	if len(npcs) > 0 {
-		str = fmt.Sprintf("%s %s", str, types.Colorize(types.ColorBlue, "NPCs: "))
+		str = fmt.Sprintf("%s %s", str, color.Colorize(color.Blue, "NPCs: "))
 
 		names := make([]string, len(npcs))
 		for i, npc := range npcs {
-			names[i] = types.Colorize(types.ColorWhite, npc.GetName())
+			names[i] = color.Colorize(color.White, npc.GetName())
 		}
-		str = fmt.Sprintf("%s %s \r\n", str, strings.Join(names, types.Colorize(types.ColorBlue, ", ")))
+		str = fmt.Sprintf("%s %s \r\n", str, strings.Join(names, color.Colorize(color.Blue, ", ")))
 
 		extraNewLine = "\r\n"
 	}
@@ -415,21 +416,21 @@ func (s *Session) printRoom(room types.Room) {
 
 		sort.Strings(nameList)
 
-		str = str + " " + types.Colorize(types.ColorBlue, "Items: ")
+		str = str + " " + color.Colorize(color.Blue, "Items: ")
 
 		var names []string
 		for _, name := range nameList {
 			if itemMap[name] > 1 {
 				name = fmt.Sprintf("%s x%v", name, itemMap[name])
 			}
-			names = append(names, types.Colorize(types.ColorWhite, name))
+			names = append(names, color.Colorize(color.White, name))
 		}
-		str = str + strings.Join(names, types.Colorize(types.ColorBlue, ", ")) + "\r\n"
+		str = str + strings.Join(names, color.Colorize(color.Blue, ", ")) + "\r\n"
 
 		extraNewLine = "\r\n"
 	}
 
-	str = str + extraNewLine + " " + types.Colorize(types.ColorBlue, "Exits: ")
+	str = str + extraNewLine + " " + color.Colorize(color.Blue, "Exits: ")
 
 	var exitList []string
 	for _, direction := range room.GetExits() {
@@ -437,7 +438,7 @@ func (s *Session) printRoom(room types.Room) {
 	}
 
 	if len(exitList) == 0 {
-		str = str + types.Colorize(types.ColorWhite, "None")
+		str = str + color.Colorize(color.White, "None")
 	} else {
 		str = str + strings.Join(exitList, " ")
 	}
@@ -445,8 +446,8 @@ func (s *Session) printRoom(room types.Room) {
 	if len(room.GetLinks()) > 0 {
 		str = fmt.Sprintf("%s\r\n\r\n %s %s",
 			str,
-			types.Colorize(types.ColorBlue, "Other exits:"),
-			types.Colorize(types.ColorWhite, strings.Join(room.LinkNames(), ", ")),
+			color.Colorize(color.Blue, "Other exits:"),
+			color.Colorize(color.White, strings.Join(room.LinkNames(), ", ")),
 		)
 	}
 

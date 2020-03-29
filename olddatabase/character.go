@@ -2,6 +2,7 @@ package olddatabase
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 
 	"github.com/yamamushi/kmud-2020/types"
 	"github.com/yamamushi/kmud-2020/utils"
@@ -190,8 +191,8 @@ func (n *Npc) PrettyConversation() string {
 	}
 
 	return fmt.Sprintf("%n%n",
-		types.Colorize(types.ColorBlue, n.GetName()),
-		types.Colorize(types.ColorWhite, ": "+conv))
+		color.Colorize(color.Blue, n.GetName()),
+		color.Colorize(color.White, ": "+conv))
 }
 
 func (c *Character) SetHealth(health int) {

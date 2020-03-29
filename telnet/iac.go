@@ -16,7 +16,7 @@ func (t *Telnet) WontEcho() {
 
 func (t *Telnet) DoWindowSize() (int, int, error) {
 	t.SendCommand(DO, WS)
-	response, err := t.ReadCommands()
+	response, err := t.ReadIACResponse()
 	if err != nil {
 		return 0, 0, err
 	}
@@ -47,7 +47,7 @@ func (t *Telnet) DoWindowSize() (int, int, error) {
 	return 0, 0, errors.New("no proper window size response found")
 }
 
-func (t *Telnet) DoTerminalType() {
+func (t *Telnet) DoTerminalType() (string, error) {
 	// This is really supposed to be two commands, one to ask if they'll send a
 	// terminal type, and another to indicate that they should send it if
 	// they've expressed a "willingness" to send it. For the time being this
@@ -56,13 +56,33 @@ func (t *Telnet) DoTerminalType() {
 	// See http://tools.ietf.org/html/rfc884
 
 	t.SendCommand(DO, TT, IAC, SB, TT, 1, IAC, SE) // 1 = SEND
+	iac, err := t.ReadIACResponse()
+	if err != nil {
+		return "", err
+	}
+	iacfields := strings.Split(iac, " ")
+
+	var term string
+	for _, field := range iacfields {
+		if strings.Contains(field, "??(") {
+			field = strings.TrimPrefix(field, "??(")
+			field = strings.TrimSuffix(field, ")")
+			val, err := strconv.Atoi(field)
+			if err != nil {
+				return "", err
+			}
+			term = term + string(val)
+		}
+	}
+
+	return strings.ToLower(term), err
 }
 
 func (t *Telnet) SendCommand(codes ...TelnetCode) {
 	t.conn.Write(BuildCommand(codes...))
 }
 
-func (t *Telnet) ReadCommands() (string, error) {
+func (t *Telnet) ReadIACResponse() (string, error) {
 	b := make([]byte, 1024)
 	_, err := t.conn.Read(b)
 	if err != nil {

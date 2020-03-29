@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/yamamushi/kmud-2020/color"
 	"strconv"
 	"strings"
 
@@ -39,7 +40,7 @@ func ExecMenu(title string, comm types.Communicable, build func(*Menu)) {
 			prompt = "> "
 		}
 
-		input := comm.GetInput(types.Colorize(types.ColorWhite, prompt))
+		input := comm.GetInput(color.Colorize(color.White, prompt))
 
 		if input == "" {
 			if menu.exitHandler != nil {
@@ -70,7 +71,7 @@ func ExecMenu(title string, comm types.Communicable, build func(*Menu)) {
 					return
 				}
 			} else if input != "?" && input != "help" {
-				comm.WriteLine(types.Colorize(types.ColorRed, "Invalid selection"))
+				comm.WriteLine(color.Colorize(color.Red, "Invalid selection"))
 			}
 		}
 	}
@@ -150,8 +151,8 @@ func filterActions(actions []action, filter string) []action {
 }
 
 func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
-	border := types.Colorize(types.ColorWhite, decorator)
-	title := types.Colorize(types.ColorBlue, m.title)
+	border := color.Colorize(color.White, decorator)
+	title := color.Colorize(color.Blue, m.title)
 	header := fmt.Sprintf("%s %s %s", border, title, border)
 
 	if filter != "" {
@@ -170,21 +171,21 @@ func (m *Menu) Print(comm types.Communicable, page int, filter string) int {
 
 		if index == -1 {
 			actionText = fmt.Sprintf("%s[%s%s%s]%s%s",
-				types.ColorDarkBlue,
-				types.ColorBlue,
+				color.DarkBlue,
+				color.Blue,
 				strings.ToUpper(action.key),
-				types.ColorDarkBlue,
-				types.ColorWhite,
+				color.DarkBlue,
+				color.White,
 				action.text)
 		} else {
 			keyLength := len(action.key)
 			actionText = fmt.Sprintf("%s%s[%s%s%s]%s%s",
 				action.text[:index],
-				types.ColorDarkBlue,
-				types.ColorBlue,
+				color.DarkBlue,
+				color.Blue,
 				action.text[index:index+keyLength],
-				types.ColorDarkBlue,
-				types.ColorWhite,
+				color.DarkBlue,
+				color.White,
 				action.text[index+keyLength:])
 		}
 

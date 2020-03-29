@@ -9,7 +9,7 @@ verbosity = log
 
 mongohost = "localhost"
 
-[login]
+[frontend]
 
 title = "kmud-2020"
 

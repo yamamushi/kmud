@@ -1,12 +1,12 @@
 package dbtest
 
 import (
+	"github.com/yamamushi/kmud-2020/color"
 	"runtime"
 	"strconv"
 	"sync"
 	"testing"
 
-	"github.com/yamamushi/kmud-2020/database"
 	"github.com/yamamushi/kmud-2020/testutils"
 	"github.com/yamamushi/kmud-2020/types"
 	"gopkg.in/mgo.v2/bson"
@@ -114,15 +114,15 @@ func Test_User(t *testing.T) {
 	user.SetOnline(true)
 
 	testutils.Assert(user.IsOnline(), t, "Call to SetOnline(true) failed")
-	testutils.Assert(user.GetColorMode() == types.ColorModeNone, t, "Newly created user should have a color mode of None")
+	testutils.Assert(user.GetColorMode() == color.ModeNone, t, "Newly created user should have a color mode of None")
 
-	user.SetColorMode(types.ColorModeLight)
+	user.SetColorMode(color.ModeLight)
 
-	testutils.Assert(user.GetColorMode() == types.ColorModeLight, t, "Call to SetColorMode(types.ColorModeLight) failed")
+	testutils.Assert(user.GetColorMode() == color.ModeLight, t, "Call to SetColorMode(types.ModeLight) failed")
 
-	user.SetColorMode(types.ColorModeDark)
+	user.SetColorMode(color.ModeDark)
 
-	testutils.Assert(user.GetColorMode() == types.ColorModeDark, t, "Call to SetColorMode(types.ColorModeDark) failed")
+	testutils.Assert(user.GetColorMode() == color.ModeDark, t, "Call to SetColorMode(types.ModeDark) failed")
 
 	pw := "password"
 	user.SetPassword(pw)
